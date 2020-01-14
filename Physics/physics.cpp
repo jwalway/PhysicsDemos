@@ -9,6 +9,7 @@
 
 // For compilers that support precompilation, includes "wx.h".
 #include "wx/wxprec.h"
+#include <vector>
 
 #ifdef __BORLANDC__
 #pragma hdrstop
@@ -22,6 +23,7 @@
 #error "OpenGL required: set wxUSE_GLCANVAS to 1 and rebuild the library"
 #endif
 
+#include "zebra.xpm"
 #include "physics.h"
 #ifdef __DARWIN__
 #include <OpenGL/glu.h>
@@ -31,6 +33,8 @@
 
 //#include "../../sample.xpm"
 #include "sample.xpm"
+
+using namespace std;
 
 // ---------------------------------------------------------------------------
 // MyApp
@@ -44,7 +48,7 @@ bool MyApp::OnInit()
 
     // Create the main frame window
     MyFrame* frame = new MyFrame(NULL, wxT("wxWidgets Penguin Sample"),
-        wxDefaultPosition, wxSize(400, 500));  // wxDefaultSize);
+        wxDefaultPosition, wxSize(800, 800));  // wxDefaultSize);
 
 
 
@@ -69,6 +73,7 @@ IMPLEMENT_APP(MyApp) //Creates a WinMain() function and an instance of our MyApp
 // ---------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
+EVT_LIST_ITEM_SELECTED(wxID_ANY, MyFrame::OnSelectSubject)
 EVT_MENU(wxID_OPEN, MyFrame::OnMenuFileOpen)
 EVT_MENU(wxID_EXIT, MyFrame::OnMenuFileExit)
 EVT_MENU(wxID_HELP, MyFrame::OnMenuHelpAbout)
@@ -116,7 +121,7 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
 
     m_list = new wxListCtrl(splitter2, wxID_ANY, wxDefaultPosition, wxSize(200, 200),
         wxLC_REPORT | wxSUNKEN_BORDER);
-    m_list->AppendColumn(wxT("Topics:"));
+    m_list->AppendColumn(wxT("Topics:"), wxLIST_FORMAT_LEFT, 200);
 
     m_richTextCtrl = new wxRichTextCtrl(splitter2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxVSCROLL | wxHSCROLL/*|wxWANTS_CHARS*/);
     splitter2->SplitHorizontally(m_list, m_richTextCtrl);
@@ -145,12 +150,61 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     m_panel->SetSizer(subsizer);
     splitter->SplitVertically(m_panel2, m_panel); // , 100);
    // splitter->SetSize(GetClientSize());
-    splitter->SetMinimumPaneSize(20);
+    splitter->SetMinimumPaneSize(200);
     this->SetSizer(sizer);
     Show(true);
 
+    PopulateListBox();
+    wxImage::AddHandler(new wxPNGHandler);
+    wxImage::AddHandler(new wxJPEGHandler);
+    wxImage::AddHandler(new wxGIFHandler);
+    WriteInitialText();
      //glGetIntegerv(GL_MAJOR_VERSION, &maj);
      //glGetIntegerv(GL_MINOR_VERSION, &min);
+}
+
+void MyFrame::PopulateListBox()
+{
+    vector<string> topics = { "Uniform Acceleration", "Acceleration Due To Gravity", "Newton's First Law" };
+
+    for (int i = 0; i < topics.size(); i++)
+        m_list->InsertItem(i, topics[i].c_str());
+}
+
+void MyFrame::WriteInitialText()
+{
+    wxRichTextCtrl& r = *m_richTextCtrl;
+
+    //r.SetDefaultStyle();
+    r.Freeze();
+    r.BeginSuppressUndo();
+    r.BeginParagraphSpacing(0, 20);
+    r.BeginAlignment(wxTEXT_ALIGNMENT_CENTER);
+    r.BeginBold();
+    r.BeginFontSize(14);
+
+    wxString lineBreak = (wxChar)29;
+
+    r.WriteText(wxString(wxT("Welcome to wxRichTextCtrl, a wxWidgets control")) + lineBreak + wxT("for editing and presenting styled text and images\n"));
+    r.EndFontSize();
+
+    r.BeginItalic();
+    r.WriteText(wxT("by John Alway"));
+    r.EndItalic();
+    r.EndBold();
+
+    r.Newline();
+
+    r.WriteImage(wxBitmap(zebra_xpm));
+
+    r.Newline();
+    r.Newline();
+
+    r.EndAlignment();
+    r.EndParagraphSpacing();
+    r.EndSuppressUndo();
+    r.Thaw();
+
 }
 
 
@@ -184,6 +238,13 @@ void MyFrame::OnButtonClicked(wxCommandEvent& evt)
         //m_btn1->Unbind()
     }
     evt.Skip(); // Tells the system that the event has been handled.
+}
+
+// Item selected from ListBoxCtrl
+void MyFrame::OnSelectSubject(wxListEvent& event)
+{    
+    int index = event.m_itemIndex;
+ 
 }
 
 // File|Open... command

@@ -85,7 +85,12 @@ private:
     wxSizer* m_framesizer;
 
     void OnButtonClicked(wxCommandEvent& evt);
+    void OnSelectSubject(wxListEvent& event);
 
+    void PopulateListBox();
+
+    void WriteInitialText();
+    
 private:
     TestGLCanvas* m_canvas;
 
