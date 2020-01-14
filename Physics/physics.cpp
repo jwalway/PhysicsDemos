@@ -106,38 +106,30 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     wxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
     m_framesizer = sizer;
     wxSplitterWindow* splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-        wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN); // wxSP_NOBORDER);
-    //wxSizer* sizer = new wxFlexGridSizer(2, 5, 5);
-    wxSizer* subsizer;
-
-    wxPanel* m_panel2 = new wxPanel(splitter, wxID_ANY);
-    wxSizer* sizer2 = new wxBoxSizer(wxHORIZONTAL);
-    m_panel2->SetSizer(sizer2);
-
-    wxSplitterWindow* splitter2 = new wxSplitterWindow(m_panel2, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
 
-    sizer2->Add(splitter2, 1, wxEXPAND);
+    wxSplitterWindow* splitter2 = new wxSplitterWindow(splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+        wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
 
-    m_list = new wxListCtrl(splitter2, wxID_ANY, wxDefaultPosition, wxSize(200, 200),
+    wxSplitterWindow* splitter3 = new wxSplitterWindow(splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+        wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
+   
+
+    m_list = new wxListCtrl(splitter3, wxID_ANY, wxDefaultPosition, wxSize(200, 200),
         wxLC_REPORT | wxSUNKEN_BORDER);
     m_list->AppendColumn(wxT("Topics:"), wxLIST_FORMAT_LEFT, 200);
 
-    m_richTextCtrl = new wxRichTextCtrl(splitter2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxVSCROLL | wxHSCROLL/*|wxWANTS_CHARS*/);
-    splitter2->SplitHorizontally(m_list, m_richTextCtrl);
-    //sizer->Add(m_list, 1, wxLEFT, 10);
+    m_richTextCtrl = new wxRichTextCtrl(splitter3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxVSCROLL | wxHSCROLL/*|wxWANTS_CHARS*/);
+
+
     sizer->Add(splitter, 1, wxEXPAND);
 
-    subsizer = new wxBoxSizer(wxVERTICAL);
-    m_panel = new wxPanel(splitter, wxID_ANY);
-    m_canvas = new TestGLCanvas(m_panel, wxID_ANY, wxDefaultPosition,
-        wxDefaultSize, // wxSize(250,300),
-        wxSUNKEN_BORDER);
+    m_panel = new wxPanel(splitter2, wxID_ANY);
+    m_canvas = new TestGLCanvas(splitter2, wxID_ANY, wxDefaultPosition,
+        wxDefaultSize,wxSUNKEN_BORDER);
 
-    subsizer->Add(m_canvas, 1, wxEXPAND, 5);
     //m_buttonOne->Bind(wxEVT_BUTTON, &MainFrameFunctions::buttonOneClicked, this);
-
-
+    
     m_wrapsizer = new wxWrapSizer(wxHORIZONTAL);  
 
     m_btn1 = new wxButton(m_panel, 10001, "Click Me", wxDefaultPosition, wxDefaultSize); 
@@ -146,10 +138,20 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     m_btn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
     m_wrapsizer->Add(m_btn1);
     m_wrapsizer->Add(m_txt1);
-    subsizer->Add(m_wrapsizer, 1, wxEXPAND, 5);
-    m_panel->SetSizer(subsizer);
-    splitter->SplitVertically(m_panel2, m_panel); // , 100);
-   // splitter->SetSize(GetClientSize());
+
+    m_panel->SetSizer(m_wrapsizer);
+   // splitter2->SplitHorizontally(m_list, m_richTextCtrl);
+   // splitter2->SetMinimumPaneSize(100);
+   // splitter3->SplitHorizontally(m_canvas, m_panel, 400);
+   // splitter3->SetMinimumPaneSize(150);
+
+    splitter2->SplitHorizontally(m_canvas, m_panel, 400);
+    splitter2->SetMinimumPaneSize(150);
+    splitter3->SplitHorizontally(m_list, m_richTextCtrl, 400);
+    splitter3->SetMinimumPaneSize(100);
+
+
+    splitter->SplitVertically(splitter2, splitter3, 550); 
     splitter->SetMinimumPaneSize(200);
     this->SetSizer(sizer);
     Show(true);
