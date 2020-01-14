@@ -1,11 +1,10 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        penguin.cpp
-// Purpose:     wxGLCanvas demo program
-// Author:      Robert Roebling
-// Modified by: Sandro Sigala
-// Created:     04/01/98
-// Copyright:   (c) Robert Roebling
-// Licence:     wxWindows licence
+// Name:        physics.cpp
+// Purpose:     physics demo program
+// Author:      John  Alway
+// 
+// Created:     1/13/2020
+// Copyright:   (c) John Alway
 /////////////////////////////////////////////////////////////////////////////
 
 // For compilers that support precompilation, includes "wx.h".
@@ -96,38 +95,7 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     menuBar->Append(fileMenu, wxT("&File"));
     menuBar->Append(helpMenu, wxT("&Help"));
     SetMenuBar(menuBar);
-
-    /*
-    m_btn1 = new wxButton(this, 10001, "Click Me", wxPoint(10, 10), wxSize( 150, 50));
-    m_txt1 = new wxTextCtrl(this, wxID_ANY, "", wxPoint(10, 70), wxSize(300, 30));
-    m_list1 = new wxListBox(this, wxID_ANY, wxPoint(10, 110), wxSize(300, 300));
-    */
-
-    /*
-    btn = new wxButton * [nFieldWidth * nFieldHeight];
-    wxGridSizer *grid = new wxGridSizer(nFieldWidth, nFieldHeight, 0, 0);
-
-    nField = new int[nFieldWidth * nFieldHeight];  //For Mind Sweeper game.
-
-    wxFont font(24, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false);
-
-    for (int x = 0; x < nFieldWidth; x++)
-    {
-        for (int y = 0; y < nFieldHeight; y++)
-        {
-            btn[y * nFieldWidth + x] = new wxButton(this, 10000 + (y * nFieldWidth + x));
-            btn[y * nFieldWidth + x]->SetFont(font);  //Set the font for each button
-            grid->Add(btn[y * nFieldWidth + x], 1, wxEXPAND | wxALL);  // wxEXPAND = occupy all space of cell
-
-            //This associates the OnButtonClicked() function with each button for a click event
-            btn[y * nFieldWidth + x]->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::OnButtonClicked, this);
-            nField[y * nFieldWidth + x] = 0; //default value
-        }
-    }
-
-    this->SetSizer(grid); //tells parent window which sizer to use.
-    grid->Layout(); // Restructure yourself according to parent's dimensions and number of buttons.
-    */
+    
 
     //Create the main layout
     wxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -137,10 +105,21 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     //wxSizer* sizer = new wxFlexGridSizer(2, 5, 5);
     wxSizer* subsizer;
 
-    m_list = new wxListCtrl(splitter, wxID_ANY, wxDefaultPosition, wxSize(200, 300),
+    wxPanel* m_panel2 = new wxPanel(splitter, wxID_ANY);
+    wxSizer* sizer2 = new wxBoxSizer(wxHORIZONTAL);
+    m_panel2->SetSizer(sizer2);
+
+    wxSplitterWindow* splitter2 = new wxSplitterWindow(m_panel2, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+        wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
+
+    sizer2->Add(splitter2, 1, wxEXPAND);
+
+    m_list = new wxListCtrl(splitter2, wxID_ANY, wxDefaultPosition, wxSize(200, 200),
         wxLC_REPORT | wxSUNKEN_BORDER);
     m_list->AppendColumn(wxT("Topics:"));
 
+    m_richTextCtrl = new wxRichTextCtrl(splitter2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxVSCROLL | wxHSCROLL/*|wxWANTS_CHARS*/);
+    splitter2->SplitHorizontally(m_list, m_richTextCtrl);
     //sizer->Add(m_list, 1, wxLEFT, 10);
     sizer->Add(splitter, 1, wxEXPAND);
 
@@ -154,28 +133,22 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     //m_buttonOne->Bind(wxEVT_BUTTON, &MainFrameFunctions::buttonOneClicked, this);
 
 
-    wxSizer* wrapsizer = new wxWrapSizer(wxHORIZONTAL); // , wxWRAPSIZER_DEFAULT_FLAGS);
-    m_wrapsizer = wrapsizer;
+    m_wrapsizer = new wxWrapSizer(wxHORIZONTAL);  
 
-    m_btn1 = new wxButton(m_panel, 10001, "Click Me", wxDefaultPosition, wxDefaultSize); // wxPoint(10, 10), wxSize(150, 50));
+    m_btn1 = new wxButton(m_panel, 10001, "Click Me", wxDefaultPosition, wxDefaultSize); 
     m_txt1 = new wxTextCtrl(m_panel, 10002, "Text Goes Here", wxDefaultPosition, wxDefaultSize);
 
     m_btn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
-    wrapsizer->Add(m_btn1);
-    wrapsizer->Add(m_txt1);
-    subsizer->Add(wrapsizer, 1, wxEXPAND, 5);
+    m_wrapsizer->Add(m_btn1);
+    m_wrapsizer->Add(m_txt1);
+    subsizer->Add(m_wrapsizer, 1, wxEXPAND, 5);
     m_panel->SetSizer(subsizer);
-
-    splitter->SplitVertically(m_list, m_panel); // , 100);
+    splitter->SplitVertically(m_panel2, m_panel); // , 100);
    // splitter->SetSize(GetClientSize());
     splitter->SetMinimumPaneSize(20);
-
-    //sizer->Add(subsizer, 1, wxEXPAND | wxBOTTOM, 5);
     this->SetSizer(sizer);
     Show(true);
 
-    // m_canvas = new TestGLCanvas(this, wxID_ANY, wxDefaultPosition,
-     //    GetClientSize(), wxSUNKEN_BORDER);
      //glGetIntegerv(GL_MAJOR_VERSION, &maj);
      //glGetIntegerv(GL_MINOR_VERSION, &min);
 }

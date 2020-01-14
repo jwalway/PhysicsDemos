@@ -1,12 +1,11 @@
 #pragma once
 /////////////////////////////////////////////////////////////////////////////
-// Name:        penguin.h
-// Purpose:     wxGLCanvas demo program
-// Author:      Robert Roebling
-// Modified by:
-// Created:     04/01/98
-// Copyright:   (c) Robert Roebling
-// Licence:     wxWindows licence
+// Name:        physics.cpp
+// Purpose:     physics demo program
+// Author:      John  Alway
+// 
+// Created:     1/13/2020
+// Copyright:   (c) John Alway
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef _PHYSICS_H_
@@ -27,6 +26,7 @@
 #endif
 
 #include "wx/glcanvas.h"
+#include "wx/richtext/richtextctrl.h"
 
 extern "C"
 {
@@ -74,15 +74,12 @@ public:
     ~MyFrame();
 private:
     wxButton* m_btn1 = nullptr;
-    wxTextCtrl* m_txt1 = nullptr;
-    wxListBox* m_list1 = nullptr;
-    wxListCtrl* m_list = nullptr;
-    wxPanel* m_panel = nullptr;
-    int nFieldWidth = 10;
-    int nFieldHeight = 10;
-    wxButton** btn;
-    int* nField = nullptr;
-    bool bFirstClick = true;
+    wxTextCtrl *m_txt1 = nullptr;
+    wxListBox *m_list1 = nullptr;
+    wxListCtrl *m_list = nullptr;
+    wxPanel *m_panel = nullptr;
+    wxRichTextCtrl *m_richTextCtrl = nullptr; 
+
 
     wxSizer* m_wrapsizer;
     wxSizer* m_framesizer;
