@@ -25,6 +25,8 @@
 #include "wx/zstream.h"
 #endif
 
+#include "GL/glew.h"
+
 #include "wx/glcanvas.h"
 #include "wx/richtext/richtextctrl.h"
 
@@ -34,6 +36,9 @@ extern "C"
 }
 
 #include "dxfrenderer.h"
+#define GL_GLEXT_PROTOTYPES
+//#include "glext.h"
+
 
 
 // OpenGL view data
@@ -55,7 +60,7 @@ public:
 
 
 // Define a new frame type
-class TestGLCanvas;
+class SimulationGLCanvas;
 
 
 class MyFrame : public wxFrame
@@ -68,8 +73,8 @@ public:
     void OnMenuFileExit(wxCommandEvent& event);
     void OnMenuHelpAbout(wxCommandEvent& event);
 
-    void SetCanvas(TestGLCanvas* canvas) { m_canvas = canvas; }
-    TestGLCanvas* GetCanvas() { return m_canvas; }
+    void SetCanvas(SimulationGLCanvas* canvas) { m_canvas = canvas; }
+    SimulationGLCanvas* GetCanvas() { return m_canvas; }
 
     ~MyFrame();
 private:
@@ -92,21 +97,21 @@ private:
     void WriteInitialText();
     
 private:
-    TestGLCanvas* m_canvas;
+    SimulationGLCanvas* m_canvas;
 
     wxDECLARE_EVENT_TABLE();
 };
 
 
-class TestGLCanvas : public wxGLCanvas
+class SimulationGLCanvas : public wxGLCanvas
 {
 public:
-    TestGLCanvas(wxWindow* parent, wxWindowID id = wxID_ANY,
+    SimulationGLCanvas(wxWindow* parent, wxWindowID id = wxID_ANY,
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize, long style = 0,
-        const wxString& name = wxT("TestGLCanvas"));
+        const wxString& name = wxT("SimulationGLCanvas"));
 
-    virtual ~TestGLCanvas();
+    virtual ~SimulationGLCanvas();
 
     void LoadDXF(const wxString& filename);
 
@@ -119,12 +124,14 @@ protected:
 private:
     void InitGL();
     void ResetProjectionMode();
+    void ResetOrthoMode();
+    void InitGLScene();
 
     wxGLContext* m_glRC;
     GLData       m_gldata;
-    DXFRenderer  m_renderer;
-
-    wxDECLARE_NO_COPY_CLASS(TestGLCanvas);
+    DXFRenderer  m_renderer;    
+    GLuint m_vertexbuffer; // This will identify our vertex buffer
+    wxDECLARE_NO_COPY_CLASS(SimulationGLCanvas);
     wxDECLARE_EVENT_TABLE();
 };
 

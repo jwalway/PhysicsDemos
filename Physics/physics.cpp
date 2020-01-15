@@ -120,12 +120,11 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     m_list->AppendColumn(wxT("Topics:"), wxLIST_FORMAT_LEFT, 200);
 
     m_richTextCtrl = new wxRichTextCtrl(splitter3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxVSCROLL | wxHSCROLL/*|wxWANTS_CHARS*/);
-
-
+  
     sizer->Add(splitter, 1, wxEXPAND);
 
     m_panel = new wxPanel(splitter2, wxID_ANY);
-    m_canvas = new TestGLCanvas(splitter2, wxID_ANY, wxDefaultPosition,
+    m_canvas = new SimulationGLCanvas(splitter2, wxID_ANY, wxDefaultPosition,
         wxDefaultSize,wxSUNKEN_BORDER);
 
     //m_buttonOne->Bind(wxEVT_BUTTON, &MainFrameFunctions::buttonOneClicked, this);
@@ -140,10 +139,6 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     m_wrapsizer->Add(m_txt1);
 
     m_panel->SetSizer(m_wrapsizer);
-   // splitter2->SplitHorizontally(m_list, m_richTextCtrl);
-   // splitter2->SetMinimumPaneSize(100);
-   // splitter3->SplitHorizontally(m_canvas, m_panel, 400);
-   // splitter3->SetMinimumPaneSize(150);
 
     splitter2->SplitHorizontally(m_canvas, m_panel, 400);
     splitter2->SetMinimumPaneSize(150);
@@ -280,17 +275,17 @@ void MyFrame::OnMenuHelpAbout(wxCommandEvent& WXUNUSED(event))
 }
 
 // ---------------------------------------------------------------------------
-// TestGLCanvas
+// SimulationGLCanvas
 // ---------------------------------------------------------------------------
 
-wxBEGIN_EVENT_TABLE(TestGLCanvas, wxGLCanvas)
-EVT_SIZE(TestGLCanvas::OnSize)
-EVT_PAINT(TestGLCanvas::OnPaint)
-EVT_ERASE_BACKGROUND(TestGLCanvas::OnEraseBackground)
-EVT_MOUSE_EVENTS(TestGLCanvas::OnMouse)
+wxBEGIN_EVENT_TABLE(SimulationGLCanvas, wxGLCanvas)
+EVT_SIZE(SimulationGLCanvas::OnSize)
+EVT_PAINT(SimulationGLCanvas::OnPaint)
+EVT_ERASE_BACKGROUND(SimulationGLCanvas::OnEraseBackground)
+EVT_MOUSE_EVENTS(SimulationGLCanvas::OnMouse)
 wxEND_EVENT_TABLE()
 
-TestGLCanvas::TestGLCanvas(wxWindow* parent,
+SimulationGLCanvas::SimulationGLCanvas(wxWindow* parent,
     wxWindowID id,
     const wxPoint& pos,
     const wxSize& size,
@@ -309,14 +304,15 @@ TestGLCanvas::TestGLCanvas(wxWindow* parent,
     m_gldata.beginy = 0.0f;
     m_gldata.zoom = 45.0f;
     trackball(m_gldata.quat, 0.0f, 0.0f, 0.0f, 0.0f);
+ 
 }
 
-TestGLCanvas::~TestGLCanvas()
+SimulationGLCanvas::~SimulationGLCanvas()
 {
     delete m_glRC;
 }
 
-void TestGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
+void SimulationGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
     // must always be here
     wxPaintDC dc(this);
@@ -327,7 +323,8 @@ void TestGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     if (!m_gldata.initialized)
     {
         InitGL();
-        ResetProjectionMode();
+        //ResetProjectionMode();
+        ResetOrthoMode();
         m_gldata.initialized = true;
     }
 
@@ -342,7 +339,33 @@ void TestGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     build_rotmatrix(m, m_gldata.quat);
     glMultMatrixf(&m[0][0]);
 
-    m_renderer.Render();
+    //m_renderer.Render();
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
+    glVertexAttribPointer(
+        0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+        3,                  // size
+        GL_FLOAT,           // type
+        GL_FALSE,           // normalized?
+        0,                  // stride
+        (void*)0            // array buffer offset
+    );
+    // Draw the triangle !
+    glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+    glDisableVertexAttribArray(0);
+
+    /*
+    float z = 6.0f, x = 1.0f, y = 1.0f;
+    glBegin(GL_QUADS);
+    //glNormal3f(0.0f, 0.0f, z);
+    glVertex3f(x, y, z);
+    glVertex3f(-x, y, z);
+    glVertex3f(-x, -y, z);
+    glVertex3f(x, -y, z);
+    glEnd();
+    */
 
     // Flush
     glFlush();
@@ -351,22 +374,23 @@ void TestGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     SwapBuffers();
 }
 
-void TestGLCanvas::OnSize(wxSizeEvent& WXUNUSED(event))
+void SimulationGLCanvas::OnSize(wxSizeEvent& WXUNUSED(event))
 {
     // Reset the OpenGL view aspect.
     // This is OK only because there is only one canvas that uses the context.
     // See the cube sample for that case that multiple canvases are made current with one context.
-    ResetProjectionMode();
+    //ResetProjectionMode();
+    ResetOrthoMode();
 }
 
-void TestGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
+void SimulationGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 {
     // Do nothing, to avoid flashing on MSW
 }
 
 // Load the DXF file.  If the zlib support is compiled in wxWidgets,
 // supports also the ".dxf.gz" gzip compressed files.
-void TestGLCanvas::LoadDXF(const wxString& filename)
+void SimulationGLCanvas::LoadDXF(const wxString& filename)
 {
     wxFileInputStream stream(filename);
     if (stream.IsOk())
@@ -389,7 +413,7 @@ void TestGLCanvas::LoadDXF(const wxString& filename)
 #endif
 }
 
-void TestGLCanvas::OnMouse(wxMouseEvent& event)
+void SimulationGLCanvas::OnMouse(wxMouseEvent& event)
 {
     if (event.Dragging())
     {
@@ -413,7 +437,7 @@ void TestGLCanvas::OnMouse(wxMouseEvent& event)
     m_gldata.beginy = event.GetY();
 }
 
-void TestGLCanvas::InitGL()
+void SimulationGLCanvas::InitGL()
 {
     static const GLfloat light0_pos[4] = { -50.0f, 50.0f, 0.0f, 0.0f };
 
@@ -426,7 +450,7 @@ void TestGLCanvas::InitGL()
     static const GLfloat light1_color[4] = { 0.4f, 0.4f, 1.0f, 1.0f };
 
     /* remove back faces */
-    glEnable(GL_CULL_FACE);
+   // glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
     /* speedups */
@@ -449,9 +473,32 @@ void TestGLCanvas::InitGL()
     char* glver = (char*)glGetString(GL_VERSION);
     int i = 0;
     i++;
+    GLenum res = glewInit();
+    string str;
+    if (res != GLEW_OK) {
+        str = (char*)glewGetErrorString(res);
+        wxLogFatalError("Error: '%s'\n", glewGetErrorString(res));
+    }
 }
 
-void TestGLCanvas::ResetProjectionMode()
+void SimulationGLCanvas::InitGLScene()
+{
+    float scale = 1.0f, z = 6.0f;
+    // An array of 3 vectors which represents 3 vertices
+    static const GLfloat g_vertex_buffer_data[] = {
+       -scale, -scale, z,
+       scale, -scale, z,
+       0.0f,  scale, z
+    };
+    // Generate 1 buffer, put the resulting identifier in vertexbuffer
+    glGenBuffers(1, &m_vertexbuffer);
+    // The following commands will talk about our 'vertexbuffer' buffer
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
+    // Give our vertices to OpenGL.
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+}
+
+void SimulationGLCanvas::ResetProjectionMode()
 {
     if (!IsShownOnScreen())
         return;
@@ -466,11 +513,49 @@ void TestGLCanvas::ResetProjectionMode()
     // It's up to the application code to update the OpenGL viewport settings.
     // In order to avoid extensive context switching, consider doing this in
     // OnPaint() rather than here, though.
-    glViewport(0, 0, (GLint)w, (GLint)h);
+    glViewport(0, 0, (GLint)w, (GLint)h);  
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45.0f, (GLfloat)w / h, 1.0, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+}
+
+void SimulationGLCanvas::ResetOrthoMode()
+{
+    int w, h;
+
+    if (!IsShownOnScreen())
+        return;
+
+    // This is normally only necessary if there is more than one wxGLCanvas
+    // or more than one wxGLContext in the application.
+    SetCurrent(*m_glRC);
+       
+    GetClientSize(&w, &h);
+    
+    // reset the viewport to the new dimensions, e.g. for screen resize
+    glViewport(0, 0, (GLint)w, (GLint)h);
+
+
+    // It's up to the application code to update the OpenGL viewport settings.
+    // In order to avoid extensive context switching, consider doing this in
+    // OnPaint() rather than here, though.
+    //glViewport(0, 0, (GLint)w, (GLint)h);
+    //gluOrtho2D(0, w, h, 0);
+
+  
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+      
+    // set up an orthographic projection with the same near clip plane
+    //glOrtho(-1.0, 1.0, -1.0, 1.0, 5, 100);
+    double mag = 0.02;
+    glOrtho(-mag*(double)w, mag*(double)w, -mag*(double)h, mag*(double)h, 5, 100);
+    //gluOrtho2D(0, w, h, 0);
+
+    // select modelview matrix and clear it out
+    glMatrixMode(GL_MODELVIEW);
 }
