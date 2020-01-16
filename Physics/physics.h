@@ -120,17 +120,21 @@ protected:
     void OnSize(wxSizeEvent& event);
     void OnEraseBackground(wxEraseEvent& event);
     void OnMouse(wxMouseEvent& event);
+    void OnIdle(wxIdleEvent& event);
 
 private:
     void InitGL();
     void ResetProjectionMode();
     void ResetOrthoMode();
     void InitGLScene();
+    void DrawScene();
 
     wxGLContext* m_glRC;
     GLData       m_gldata;
     DXFRenderer  m_renderer;    
-    GLuint m_vertexbuffer; // This will identify our vertex buffer
+    GLuint m_vertexbuffer=0; // This will identify our vertex buffer
+    LARGE_INTEGER m_frequency, m_startTime, m_endTime, m_elapsedTime;
+    double m_deltaSeconds = 0.0;
     wxDECLARE_NO_COPY_CLASS(SimulationGLCanvas);
     wxDECLARE_EVENT_TABLE();
 };

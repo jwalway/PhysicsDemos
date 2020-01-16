@@ -80,6 +80,8 @@ EVT_MENU(wxID_HELP, MyFrame::OnMenuHelpAbout)
 // EVT_BUTTON(10001, OnButtonClicked)
 wxEND_EVENT_TABLE()
 
+
+
 // MyFrame constructor
 MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     const wxSize& size, long style)
@@ -158,6 +160,21 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     WriteInitialText();
      //glGetIntegerv(GL_MAJOR_VERSION, &maj);
      //glGetIntegerv(GL_MINOR_VERSION, &min);
+
+    LARGE_INTEGER Frequency, StartTime, EndTime, ElapsedTime;
+
+    QueryPerformanceFrequency(&Frequency);
+    QueryPerformanceCounter(&StartTime);
+    for (int k = 0; k < 1000; k++) {
+        for (int j = 0; j < 1000; j++) {
+            int l = 0;
+            l++;
+        }
+    }
+    QueryPerformanceCounter(&EndTime);
+    ElapsedTime.QuadPart = EndTime.QuadPart - StartTime.QuadPart;
+    int stop = 0;
+    stop++;
 }
 
 void MyFrame::PopulateListBox()
@@ -283,6 +300,7 @@ EVT_SIZE(SimulationGLCanvas::OnSize)
 EVT_PAINT(SimulationGLCanvas::OnPaint)
 EVT_ERASE_BACKGROUND(SimulationGLCanvas::OnEraseBackground)
 EVT_MOUSE_EVENTS(SimulationGLCanvas::OnMouse)
+EVT_IDLE(SimulationGLCanvas::OnIdle)
 wxEND_EVENT_TABLE()
 
 SimulationGLCanvas::SimulationGLCanvas(wxWindow* parent,
@@ -304,7 +322,8 @@ SimulationGLCanvas::SimulationGLCanvas(wxWindow* parent,
     m_gldata.beginy = 0.0f;
     m_gldata.zoom = 45.0f;
     trackball(m_gldata.quat, 0.0f, 0.0f, 0.0f, 0.0f);
- 
+    QueryPerformanceFrequency(&m_frequency);  //Get the base frequence for timer
+    QueryPerformanceCounter(&m_startTime); //Initialize counter
 }
 
 SimulationGLCanvas::~SimulationGLCanvas()
@@ -314,8 +333,38 @@ SimulationGLCanvas::~SimulationGLCanvas()
 
 void SimulationGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
+    DrawScene();
+}
+
+void SimulationGLCanvas::OnSize(wxSizeEvent& WXUNUSED(event))
+{
+    // Reset the OpenGL view aspect.
+    // This is OK only because there is only one canvas that uses the context.
+    // See the cube sample for that case that multiple canvases are made current with one context.
+    //ResetProjectionMode();
+    ResetOrthoMode();
+}
+
+void SimulationGLCanvas::DrawScene()
+{
     // must always be here
     wxPaintDC dc(this);
+    double dx=0.0, dy=0.0;
+    double velx = 1.0, vely = 1.0;
+    dx = velx*m_deltaSeconds;
+    dy = vely * m_deltaSeconds;
+    //SetCurrent(GetContext());
+    //SimulationGLCanvas& canvas = wxGetApp().GetContext
+   // wxGLCanvas::SetCurrent(*GetContext());
+    static float xdist=0.0f, ydist=0.0f;
+
+    xdist += (float)dx;
+    ydist += (float)dy;
+
+    if (xdist > 10.0f)
+        xdist = 0.0f;
+    if (ydist > 10.0f)
+        ydist = 0.0f;
 
     SetCurrent(*m_glRC);
 
@@ -327,6 +376,8 @@ void SimulationGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
         ResetOrthoMode();
         m_gldata.initialized = true;
     }
+    static int count = 0;
+    count++;
 
     // Clear
     glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
@@ -339,9 +390,11 @@ void SimulationGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     build_rotmatrix(m, m_gldata.quat);
     glMultMatrixf(&m[0][0]);
 
+
     //m_renderer.Render();
 
     // 1st attribute buffer : vertices
+    /*
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
     glVertexAttribPointer(
@@ -355,9 +408,30 @@ void SimulationGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     // Draw the triangle !
     glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
     glDisableVertexAttribArray(0);
+    */
 
+    //Triangle using VBO... this code works! (1/15/20, 12:29 p.m.)
+    // VBO transfers data right to the graphics card.
     /*
-    float z = 6.0f, x = 1.0f, y = 1.0f;
+    float scale = 0.5f, z = 6.0f;
+
+    static const GLfloat vertices[] = {
+        0.0, scale, z,  // middle top corner
+        -scale, -scale, z, // bottom left corner
+         scale,  -scale, z // bottom right corner
+    };
+
+    //
+    glEnableClientState(GL_VERTEX_ARRAY );
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDisableClientState(GL_VERTEX_ARRAY);
+
+     */
+    float x = 1.0f, y = 1.0f;
+    float z = 6.0f;
+    x = x + xdist;
+    y = y + ydist;
     glBegin(GL_QUADS);
     //glNormal3f(0.0f, 0.0f, z);
     glVertex3f(x, y, z);
@@ -365,22 +439,32 @@ void SimulationGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     glVertex3f(-x, -y, z);
     glVertex3f(x, -y, z);
     glEnd();
-    */
+ 
 
-    // Flush
+ // Flush
     glFlush();
 
     // Swap
     SwapBuffers();
 }
 
-void SimulationGLCanvas::OnSize(wxSizeEvent& WXUNUSED(event))
+void SimulationGLCanvas::OnIdle(wxIdleEvent& event)
 {
-    // Reset the OpenGL view aspect.
-    // This is OK only because there is only one canvas that uses the context.
-    // See the cube sample for that case that multiple canvases are made current with one context.
-    //ResetProjectionMode();
-    ResetOrthoMode();
+   // DrawScene();
+    static int count = 0;
+    count++;
+    //event.RequestMore();
+    QueryPerformanceCounter(&m_endTime);
+    m_elapsedTime.QuadPart = m_endTime.QuadPart - m_startTime.QuadPart; //Number of ticks since last call
+    m_startTime = m_endTime;
+    m_elapsedTime.QuadPart *= 1000000; // set up for aseconds to microseconds conversion
+    m_elapsedTime.QuadPart /= m_frequency.QuadPart; //Now determine the number of microseconds since last call of OnIdle()
+    m_deltaSeconds = (double)m_elapsedTime.QuadPart / 1000000.0;
+    //BeginPaint()
+   // wxPaintEvent unused;
+    //OnPaint(unused);
+    Refresh(false);
+    event.RequestMore();
 }
 
 void SimulationGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
@@ -466,7 +550,7 @@ void SimulationGLCanvas::InitGL()
     glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_color);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
 
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
@@ -479,17 +563,19 @@ void SimulationGLCanvas::InitGL()
         str = (char*)glewGetErrorString(res);
         wxLogFatalError("Error: '%s'\n", glewGetErrorString(res));
     }
+    InitGLScene();
 }
 
 void SimulationGLCanvas::InitGLScene()
 {
-    float scale = 1.0f, z = 6.0f;
-    // An array of 3 vectors which represents 3 vertices
+    float scale = 1.5f, z = 6.0f;
+    // An array of 3 vectors which represents 3 vertices   
     static const GLfloat g_vertex_buffer_data[] = {
        -scale, -scale, z,
        scale, -scale, z,
        0.0f,  scale, z
     };
+   
     // Generate 1 buffer, put the resulting identifier in vertexbuffer
     glGenBuffers(1, &m_vertexbuffer);
     // The following commands will talk about our 'vertexbuffer' buffer
