@@ -326,6 +326,143 @@ SimulationGLCanvas::SimulationGLCanvas(wxWindow* parent,
     QueryPerformanceCounter(&m_startTime); //Initialize counter
 }
 
+GLuint SimulationGLCanvas::LoadTexture(const char* imagepath)
+{
+    // Data read from the header of the BMP file
+    unsigned char header[54]; // Each BMP file begins by a 54-bytes header
+    unsigned int dataPos;     // Position in the file where the actual data begins
+    unsigned int width, height;
+    unsigned int imageSize;   // = width*height*3
+    // Actual RGB data
+    unsigned char* data;
+
+    // Open the file
+    FILE* file = fopen(imagepath, "rb");
+    if (!file) { printf("Image could not be opened\n"); return 0; }
+
+    if (fread(header, 1, 54, file) != 54) { // If not 54 bytes read : problem
+        printf("Not a correct BMP file\n");
+        return false;
+    }
+
+    if (header[0] != 'B' || header[1] != 'M') {
+        printf("Not a correct BMP file\n");
+        return 0;
+    }
+
+    // Read ints from the byte array
+    dataPos = *(int*)&(header[0x0A]);
+    imageSize = *(int*)&(header[0x22]);
+    width = *(int*)&(header[0x12]);
+    height = *(int*)&(header[0x16]);
+
+    // Some BMP files are misformatted, guess missing information
+    if (imageSize == 0)    imageSize = width * height * 3; // 3 : one byte for each Red, Green and Blue component
+    if (dataPos == 0)      dataPos = 54; // The BMP header is done that way
+
+    // Create a buffer
+    data = new unsigned char[imageSize];
+
+    // Read the actual data from the file into the buffer
+    fread(data, 1, imageSize, file);
+
+    //Everything is in memory now, the file can be closed
+    fclose(file);
+
+    // Create one OpenGL texture
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // Give the image to OpenGL
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    return textureID;
+}
+
+int SimulationGLCanvas::CompileLinkShaders()
+{
+    //First the Vertex Shader
+    const char* vertexShaderSource = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+
+    //The first thing we need to do is create a shader object, again referenced by an ID
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+    //Next we attach the shader source code to the shader object and compile the shader:
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+    //Was the compile successful?
+    int  success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        return -1;
+    }
+
+    //Second the Fragment Shader
+    const char* fragmentShaderSource = "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main()\n"
+        "{\n"
+        "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "}\n";
+
+    //Compile the Fragment shader
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    //Was compile successful?
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        return -1;
+    }
+
+    //Linking the two shaders
+
+    //To use the recently compiled shaders we have to link them to a shader program object 
+    //and then activate this shader program when rendering objects. The activated shader
+    //program's shaders will be used when we issue render calls.
+
+    //First create a program object
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    
+    //Now attached the previously compiled shaders and link them
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    //Was linking successful?
+
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        return -1;
+    }
+    m_shaderProgram = shaderProgram;
+    return 0;
+}
+
 SimulationGLCanvas::~SimulationGLCanvas()
 {
     delete m_glRC;
@@ -432,6 +569,7 @@ void SimulationGLCanvas::DrawScene()
     float z = 6.0f;
     x = x + xdist;
     y = y + ydist;
+    /*
     glBegin(GL_QUADS);
     //glNormal3f(0.0f, 0.0f, z);
     glVertex3f(x, y, z);
@@ -439,8 +577,20 @@ void SimulationGLCanvas::DrawScene()
     glVertex3f(-x, -y, z);
     glVertex3f(x, -y, z);
     glEnd();
- 
+     */
 
+    //Texture tutorial
+
+    // ..:: Drawing code (in render loop) :: ..
+    glUseProgram(m_shaderProgram);
+    glBindVertexArray(m_VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+
+   // glBindTexture(GL_TEXTURE_2D, m_textureID);
+    //glBindVertexArray(VAO);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
  // Flush
     glFlush();
 
@@ -460,11 +610,9 @@ void SimulationGLCanvas::OnIdle(wxIdleEvent& event)
     m_elapsedTime.QuadPart *= 1000000; // set up for aseconds to microseconds conversion
     m_elapsedTime.QuadPart /= m_frequency.QuadPart; //Now determine the number of microseconds since last call of OnIdle()
     m_deltaSeconds = (double)m_elapsedTime.QuadPart / 1000000.0;
-    //BeginPaint()
-   // wxPaintEvent unused;
-    //OnPaint(unused);
-    Refresh(false);
-    event.RequestMore();
+
+    //Refresh(false);
+    //event.RequestMore();
 }
 
 void SimulationGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
@@ -582,6 +730,44 @@ void SimulationGLCanvas::InitGLScene()
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
     // Give our vertices to OpenGL.
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+
+    //shape for texturing
+    //unsigned int VBO;
+
+  
+
+    float vertices[] = {
+    -scale, -scale, z,
+     scale, -scale, z,
+     0.0,  scale, z
+    };
+    
+    unsigned int indices[] = {  // note that we start from 0!
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
+    };
+    unsigned int VBO, VAO, EBO;
+
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &VAO);
+    glGenBuffers(1, &EBO);
+// ..:: Initialization code :: ..
+// 1. bind Vertex Array Object
+    glBindVertexArray(VAO);
+    // 2. copy our vertices array in a vertex buffer for OpenGL to use
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // 3. copy our index array in a element buffer for OpenGL to use
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // 4. then set the vertex attributes pointers
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    m_VAO = VAO;
+
+    CompileLinkShaders();
 }
 
 void SimulationGLCanvas::ResetProjectionMode()

@@ -121,6 +121,8 @@ protected:
     void OnEraseBackground(wxEraseEvent& event);
     void OnMouse(wxMouseEvent& event);
     void OnIdle(wxIdleEvent& event);
+    GLuint LoadTexture(const char* imagepath);
+    int CompileLinkShaders();
 
 private:
     void InitGL();
@@ -134,6 +136,10 @@ private:
     DXFRenderer  m_renderer;    
     GLuint m_vertexbuffer=0; // This will identify our vertex buffer
     LARGE_INTEGER m_frequency, m_startTime, m_endTime, m_elapsedTime;
+    GLuint m_textureID;
+    unsigned int m_VBO;
+    unsigned int m_VAO;
+    unsigned int m_shaderProgram;
     double m_deltaSeconds = 0.0;
     wxDECLARE_NO_COPY_CLASS(SimulationGLCanvas);
     wxDECLARE_EVENT_TABLE();
