@@ -20,6 +20,8 @@
 #include "wx/listctrl.h"
 #include "wx/wrapsizer.h"
 #include "wx/splitter.h"
+#include <fstream>
+#include <sstream>
 
 #if wxUSE_ZLIB
 #include "wx/zstream.h"
@@ -114,6 +116,7 @@ public:
     virtual ~SimulationGLCanvas();
 
     void LoadDXF(const wxString& filename);
+    void LoadShaders(const char* vertexFile,const char* fragmentFile);
 
 protected:
     void OnPaint(wxPaintEvent& event);
@@ -130,6 +133,8 @@ private:
     void ResetOrthoMode();
     void InitGLScene();
     void DrawScene();
+    unsigned int CompileShader(const char* filename, unsigned int shaderType);
+    unsigned int LinkShaders(unsigned int vertex, unsigned int fragment);
 
     wxGLContext* m_glRC;
     GLData       m_gldata;
@@ -144,5 +149,6 @@ private:
     wxDECLARE_NO_COPY_CLASS(SimulationGLCanvas);
     wxDECLARE_EVENT_TABLE();
 };
+
 
 #endif // #ifndef _PHYSICS_H_

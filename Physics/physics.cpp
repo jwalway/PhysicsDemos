@@ -385,15 +385,106 @@ GLuint SimulationGLCanvas::LoadTexture(const char* imagepath)
     return textureID;
 }
 
+void SimulationGLCanvas::LoadShaders(const char* vertexFile, const char* fragmentFile)
+{
+    unsigned int vshader = CompileShader(vertexFile, GL_VERTEX_SHADER);
+    if (!vshader) return;
+    unsigned int fshader = CompileShader(fragmentFile, GL_FRAGMENT_SHADER);
+    if (!fshader) return;
+    unsigned int shaderProgram = LinkShaders(vshader, fshader);
+    if (!shaderProgram) return;
+    m_shaderProgram = shaderProgram;
+}
+
+// Pass the filename of the shader to be compiled, and the shader type, which could be
+// either GL_VERTEX_SHADER or GL_FRAGMENT_SHADER
+unsigned int SimulationGLCanvas::CompileShader(const char* filename, unsigned int shaderType)
+{
+    // 1. retrieve the vertex/fragment source code from filePath
+    string shaderCode;    
+    ifstream shaderFile;
+    std::stringstream shaderStream;
+
+    shaderFile.open(filename);
+
+    if (!shaderFile) {
+        //Error, Couldn't Open File.  Create a wxDialog() box
+        return 0;
+    }
+    
+    // read file's buffer contents into streams
+    shaderStream << shaderFile.rdbuf();    
+    // close file handlers
+    shaderFile.close();
+    
+    // convert stream into string
+    shaderCode = shaderStream.str();
+    const char* shaderCodeStr = shaderCode.c_str();    
+    unsigned int shaderObject;
+
+    shaderObject = glCreateShader(shaderType); // GL_VERTEX_SHADER);
+    glShaderSource(shaderObject, 1, &shaderCodeStr, NULL);
+    glCompileShader(shaderObject);
+
+    int success;
+    char infoLog[1024];
+    glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &success);
+    if (!success)
+    { //Error
+        glGetShaderInfoLog(shaderObject, 1024, NULL, infoLog);
+        //std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+        return 0;
+    }
+    return shaderObject;
+}
+
+unsigned int SimulationGLCanvas::LinkShaders(unsigned int vertex, unsigned int fragment)
+{
+    unsigned int shaderProgram = glCreateProgram();
+
+    glAttachShader(shaderProgram, vertex);
+    glAttachShader(shaderProgram, fragment);
+    glLinkProgram(shaderProgram);
+
+    int success;
+    char infoLog[1024];
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) { //Error
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        return 0;
+    }
+    m_shaderProgram = shaderProgram;
+    return m_shaderProgram;
+}
+
 int SimulationGLCanvas::CompileLinkShaders()
 {
     //First the Vertex Shader
-    const char* vertexShaderSource = "#version 330 core\n"
+    const char* vertexShaderSource0 = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
+
+    const char* vertexShaderSource1 = "#version 330 core\n"
+        "layout(location = 0) in vec3 aPos; // the position variable has attribute position 0\n"
+        "out vec4 vertexColor; // specify a color output to the fragment shader\n"
+        "void main()\n"
+        "{\n"
+        "    gl_Position = vec4(aPos, 1.0); // see how we directly give a vec3 to vec4's constructor\n"
+        "    vertexColor = vec4(0.5, 0.0, 0.0, 1.0); // set the output variable to a dark-red color\n"
+        "}\n";
+
+    const char* vertexShaderSource = "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;   // the position variable has attribute position 0\n"
+        "layout (location = 1) in vec3 aColor; // the color variable has attribute position 1\n"
+        "out vec3 ourColor; // output a color to the fragment shader\n"
+        "void main()\n"
+        "{\n"
+        "    gl_Position = vec4(aPos, 1.0);\n"
+        "    ourColor = aColor; // set ourColor to the input color we got from the vertex data\n"
+        "}\n";
 
     //The first thing we need to do is create a shader object, again referenced by an ID
     unsigned int vertexShader;
@@ -415,13 +506,34 @@ int SimulationGLCanvas::CompileLinkShaders()
     }
 
     //Second the Fragment Shader
-    const char* fragmentShaderSource = "#version 330 core\n"
+    const char* fragmentShaderSource0 = "#version 330 core\n"
         "out vec4 FragColor;\n"
         "void main()\n"
         "{\n"
         "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
         "}\n";
+    const char* fragmentShaderSource1 = "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "in vec4 vertexColor; // the input variable from the vertex shader (same name and same type)\n"
+        "void main()\n"
+        "{\n"
+        "    FragColor = vertexColor;\n"
+        "}\n";
+    const char* fragmentShaderSource2 = "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "uniform vec4 ourColor; // we set this variable in the OpenGL code.\n"
+        "void main()\n"
+        "{\n"
+        "    FragColor = ourColor;\n"
+        "}\n";
 
+    const char* fragmentShaderSource = "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "in vec3 ourColor;\n"
+        "void main()\n"
+        "{\n"
+        "    FragColor = vec4(ourColor, 1.0);\n"
+        "}\n";
     //Compile the Fragment shader
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -581,10 +693,14 @@ void SimulationGLCanvas::DrawScene()
 
     //Texture tutorial
 
+   // int vertexColorLocation = glGetUniformLocation(m_shaderProgram, "ourColor");
+
     // ..:: Drawing code (in render loop) :: ..
     glUseProgram(m_shaderProgram);
+   // glUniform4f(vertexColorLocation, 0.0f, 0.8f, 0.0f, 1.0f);
     glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
 
 
@@ -737,21 +853,38 @@ void SimulationGLCanvas::InitGLScene()
 
   
 
-    float vertices[] = {
+    /*float vertices[] = {
     -scale, -scale, z,
      scale, -scale, z,
      0.0,  scale, z
+    };*/
+
+    scale = 0.5;
+   z = 0.0f;
+    /*
+    float vertices[] = {
+     scale,  scale, z,  // top right
+     scale, -scale, z,  // bottom right
+    -scale, -scale, z,  // bottom left
+    -scale,  scale, z   // top left 
     };
     
     unsigned int indices[] = {  // note that we start from 0!
     0, 1, 3,   // first triangle
     1, 2, 3    // second triangle
     };
+    */
+    float vertices[] = {
+        // positions         // colors
+         scale, -scale, z,  1.0f, 0.0f, 0.0f,   // bottom right
+        -scale, -scale, z,  0.0f, 1.0f, 0.0f,   // bottom left
+         0.0f,  scale, z,  0.0f, 0.0f, 1.0f    // top 
+    };
     unsigned int VBO, VAO, EBO;
 
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &VAO);
-    glGenBuffers(1, &EBO);
+    //glGenBuffers(1, &EBO);
 // ..:: Initialization code :: ..
 // 1. bind Vertex Array Object
     glBindVertexArray(VAO);
@@ -759,15 +892,23 @@ void SimulationGLCanvas::InitGLScene()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     // 3. copy our index array in a element buffer for OpenGL to use
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+   // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     // 4. then set the vertex attributes pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //glEnableVertexAttribArray(0);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     m_VAO = VAO;
 
-    CompileLinkShaders();
+    //CompileLinkShaders();
+    LoadShaders("multicolor.vert", "multicolor.frag");
 }
 
 void SimulationGLCanvas::ResetProjectionMode()
