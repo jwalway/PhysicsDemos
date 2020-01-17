@@ -160,21 +160,6 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     WriteInitialText();
      //glGetIntegerv(GL_MAJOR_VERSION, &maj);
      //glGetIntegerv(GL_MINOR_VERSION, &min);
-
-    LARGE_INTEGER Frequency, StartTime, EndTime, ElapsedTime;
-
-    QueryPerformanceFrequency(&Frequency);
-    QueryPerformanceCounter(&StartTime);
-    for (int k = 0; k < 1000; k++) {
-        for (int j = 0; j < 1000; j++) {
-            int l = 0;
-            l++;
-        }
-    }
-    QueryPerformanceCounter(&EndTime);
-    ElapsedTime.QuadPart = EndTime.QuadPart - StartTime.QuadPart;
-    int stop = 0;
-    stop++;
 }
 
 void MyFrame::PopulateListBox()
@@ -407,8 +392,8 @@ unsigned int SimulationGLCanvas::CompileShader(const char* filename, unsigned in
 
     shaderFile.open(filename);
 
-    if (!shaderFile) {
-        //Error, Couldn't Open File.  Create a wxDialog() box
+    if (!shaderFile) { 
+        wxMessageBox(wxString::Format("Was unable to open %s!", filename), wxT("Error"));        
         return 0;
     }
     
@@ -431,8 +416,14 @@ unsigned int SimulationGLCanvas::CompileShader(const char* filename, unsigned in
     glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &success);
     if (!success)
     { //Error
+        string str;
+        if (shaderType == GL_VERTEX_SHADER)
+            str = "Vertex";
+        else
+            str = "Fragment";
         glGetShaderInfoLog(shaderObject, 1024, NULL, infoLog);
         //std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+        wxMessageBox(wxString::Format("%s!", infoLog), wxString::Format("%s Shader Compile Error", str.c_str()));
         return 0;
     }
     return shaderObject;
@@ -451,128 +442,11 @@ unsigned int SimulationGLCanvas::LinkShaders(unsigned int vertex, unsigned int f
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) { //Error
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        wxMessageBox(wxString::Format("%s!", infoLog), wxString::Format("Shader Link Error"));
         return 0;
     }
     m_shaderProgram = shaderProgram;
     return m_shaderProgram;
-}
-
-int SimulationGLCanvas::CompileLinkShaders()
-{
-    //First the Vertex Shader
-    const char* vertexShaderSource0 = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-    const char* vertexShaderSource1 = "#version 330 core\n"
-        "layout(location = 0) in vec3 aPos; // the position variable has attribute position 0\n"
-        "out vec4 vertexColor; // specify a color output to the fragment shader\n"
-        "void main()\n"
-        "{\n"
-        "    gl_Position = vec4(aPos, 1.0); // see how we directly give a vec3 to vec4's constructor\n"
-        "    vertexColor = vec4(0.5, 0.0, 0.0, 1.0); // set the output variable to a dark-red color\n"
-        "}\n";
-
-    const char* vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;   // the position variable has attribute position 0\n"
-        "layout (location = 1) in vec3 aColor; // the color variable has attribute position 1\n"
-        "out vec3 ourColor; // output a color to the fragment shader\n"
-        "void main()\n"
-        "{\n"
-        "    gl_Position = vec4(aPos, 1.0);\n"
-        "    ourColor = aColor; // set ourColor to the input color we got from the vertex data\n"
-        "}\n";
-
-    //The first thing we need to do is create a shader object, again referenced by an ID
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-    //Next we attach the shader source code to the shader object and compile the shader:
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    //Was the compile successful?
-    int  success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-        return -1;
-    }
-
-    //Second the Fragment Shader
-    const char* fragmentShaderSource0 = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}\n";
-    const char* fragmentShaderSource1 = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "in vec4 vertexColor; // the input variable from the vertex shader (same name and same type)\n"
-        "void main()\n"
-        "{\n"
-        "    FragColor = vertexColor;\n"
-        "}\n";
-    const char* fragmentShaderSource2 = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "uniform vec4 ourColor; // we set this variable in the OpenGL code.\n"
-        "void main()\n"
-        "{\n"
-        "    FragColor = ourColor;\n"
-        "}\n";
-
-    const char* fragmentShaderSource = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "in vec3 ourColor;\n"
-        "void main()\n"
-        "{\n"
-        "    FragColor = vec4(ourColor, 1.0);\n"
-        "}\n";
-    //Compile the Fragment shader
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    //Was compile successful?
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-        return -1;
-    }
-
-    //Linking the two shaders
-
-    //To use the recently compiled shaders we have to link them to a shader program object 
-    //and then activate this shader program when rendering objects. The activated shader
-    //program's shaders will be used when we issue render calls.
-
-    //First create a program object
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    
-    //Now attached the previously compiled shaders and link them
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    //Was linking successful?
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        return -1;
-    }
-    m_shaderProgram = shaderProgram;
-    return 0;
 }
 
 SimulationGLCanvas::~SimulationGLCanvas()
@@ -698,12 +572,14 @@ void SimulationGLCanvas::DrawScene()
     // ..:: Drawing code (in render loop) :: ..
     glUseProgram(m_shaderProgram);
    // glUniform4f(vertexColorLocation, 0.0f, 0.8f, 0.0f, 1.0f);
-    glBindVertexArray(m_VAO);
+   // glBindVertexArray(m_VAO);
     //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glBindVertexArray(0);
+    //glDrawArrays(GL_TRIANGLES, 0, 3);
+    //glBindVertexArray(0);
 
-
+    glBindTexture(GL_TEXTURE_2D, m_textureID);
+    glBindVertexArray(m_VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
    // glBindTexture(GL_TEXTURE_2D, m_textureID);
     //glBindVertexArray(VAO);
     //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -828,6 +704,7 @@ void SimulationGLCanvas::InitGL()
         wxLogFatalError("Error: '%s'\n", glewGetErrorString(res));
     }
     InitGLScene();
+    m_textureID = LoadTexture("bricks_256by256.bmp");
 }
 
 void SimulationGLCanvas::InitGLScene()
@@ -874,17 +751,33 @@ void SimulationGLCanvas::InitGLScene()
     1, 2, 3    // second triangle
     };
     */
+
+   /*
     float vertices[] = {
         // positions         // colors
          scale, -scale, z,  1.0f, 0.0f, 0.0f,   // bottom right
         -scale, -scale, z,  0.0f, 1.0f, 0.0f,   // bottom left
          0.0f,  scale, z,  0.0f, 0.0f, 1.0f    // top 
     };
+    */
+    float vertices[] = {
+        // positions          // colors           // texture coords
+         scale,  scale, z,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+         scale, -scale, z,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -scale, -scale, z,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -scale,  scale, z,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    };
+
+    unsigned int indices[] = {
+    0, 1, 3, // first triangle
+    1, 2, 3  // second triangle
+    };
+
     unsigned int VBO, VAO, EBO;
 
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &VAO);
-    //glGenBuffers(1, &EBO);
+    glGenBuffers(1, &EBO);
 // ..:: Initialization code :: ..
 // 1. bind Vertex Array Object
     glBindVertexArray(VAO);
@@ -892,23 +785,27 @@ void SimulationGLCanvas::InitGLScene()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     // 3. copy our index array in a element buffer for OpenGL to use
-   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-   // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     // 4. then set the vertex attributes pointers
     //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     //glEnableVertexAttribArray(0);
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     m_VAO = VAO;
 
     //CompileLinkShaders();
-    LoadShaders("multicolor.vert", "multicolor.frag");
+    LoadShaders("texture2.vert", "texture2.frag");
 }
 
 void SimulationGLCanvas::ResetProjectionMode()

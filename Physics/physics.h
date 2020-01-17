@@ -125,7 +125,6 @@ protected:
     void OnMouse(wxMouseEvent& event);
     void OnIdle(wxIdleEvent& event);
     GLuint LoadTexture(const char* imagepath);
-    int CompileLinkShaders();
 
 private:
     void InitGL();
