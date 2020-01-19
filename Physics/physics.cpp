@@ -33,12 +33,28 @@
 
 //#include "../../sample.xpm"
 #include "sample.xpm"
+#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 using namespace std;
 
 // ---------------------------------------------------------------------------
 // MyApp
 // ---------------------------------------------------------------------------
+
+
+int foo()
+{
+    glm::vec4 Position = glm::vec4(glm::vec3(0.0), 1.0);
+    glm::mat4 Model = glm::mat4(1.0);
+    Model[4] = glm::vec4(1.0, 1.0, 0.0, 1.0);
+    glm::vec4 Transformed = Model * Position;
+    return 0;
+}
 
 // `Main program' equivalent, creating windows and returning main app frame
 bool MyApp::OnInit()
@@ -160,6 +176,8 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     WriteInitialText();
      //glGetIntegerv(GL_MAJOR_VERSION, &maj);
      //glGetIntegerv(GL_MINOR_VERSION, &min);
+    //AnimationScene animate;
+    //animate.LoadObjects("animation1.data");
 }
 
 void MyFrame::PopulateListBox()
@@ -313,6 +331,29 @@ SimulationGLCanvas::SimulationGLCanvas(wxWindow* parent,
 
 GLuint SimulationGLCanvas::LoadTexture(const char* imagepath)
 {
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    // Give the image to OpenGL
+    if (nrChannels == 3) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+    }
+    else {
+        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    return textureID;
+}
+
+GLuint SimulationGLCanvas::LoadTextureBMP(const char* imagepath)
+{
     // Data read from the header of the BMP file
     unsigned char header[54]; // Each BMP file begins by a 54-bytes header
     unsigned int dataPos;     // Position in the file where the actual data begins
@@ -452,6 +493,9 @@ unsigned int SimulationGLCanvas::LinkShaders(unsigned int vertex, unsigned int f
 SimulationGLCanvas::~SimulationGLCanvas()
 {
     delete m_glRC;
+
+    if (m_animationScene != nullptr)
+        delete m_animationScene; 
 }
 
 void SimulationGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
@@ -469,6 +513,125 @@ void SimulationGLCanvas::OnSize(wxSizeEvent& WXUNUSED(event))
 }
 
 void SimulationGLCanvas::DrawScene()
+{
+    // must always be here
+    wxPaintDC dc(this);
+
+    SetCurrent(*m_glRC);
+
+    // Initialize OpenGL
+    if (!m_gldata.initialized)
+    {
+        InitGL();
+        //ResetProjectionMode();
+        ResetOrthoMode();
+        m_gldata.initialized = true;
+    }
+
+    glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Transformations
+    glLoadIdentity();
+    glTranslatef(0.0f, 0.0f, -20.0f);
+
+    glUseProgram(m_shaderProgram);
+    m_animationScene->Draw(m_deltaSeconds, m_shaderProgram);    
+    
+  // Flush
+    glFlush();
+
+    // Swap
+    SwapBuffers();
+}
+
+void SimulationGLCanvas::DrawScene3()
+{
+    // must always be here
+    wxPaintDC dc(this);
+
+
+    SetCurrent(*m_glRC);
+
+    // Initialize OpenGL
+    if (!m_gldata.initialized)
+    {
+        InitGL();
+        //ResetProjectionMode();
+        ResetOrthoMode();
+        m_gldata.initialized = true;
+    }
+
+    double dx = 0.0, dy = 0.0;
+    double velx = 0.2, vely = 0.2;
+    dx = velx * m_deltaSeconds;
+    dy = vely * m_deltaSeconds;
+    //SetCurrent(GetContext());
+    //SimulationGLCanvas& canvas = wxGetApp().GetContext
+   // wxGLCanvas::SetCurrent(*GetContext());
+    static float xdist = 0.0f, ydist = 0.0f;
+    static float signx = 1, signy = 1;
+
+    xdist += (float)dx * signx;
+    ydist += (float)dy * signy;
+
+    if (xdist > 1.0f) {
+        xdist = 1.0f;
+        signx = -1;
+    }
+    if (xdist < -1.0f) {
+        xdist = -1.0f;
+        signx = 1;
+    }
+    if (ydist > 1.0f) {
+        ydist = 1.0f;
+        signy = -1.0f;
+    }
+    if (ydist < -1.0f) {
+        ydist = -1.0f;
+        signy = 1.0f;
+    }
+    glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Transformations
+    glLoadIdentity();
+    glTranslatef(xdist, 0.0f, -20.0f);
+
+    glm::vec4 vec(5.0f, 5.0f, 0.0f, 1.0f);
+    glm::mat4 trans = glm::mat4(1.0f);
+    static float deg = 0.0f;
+    deg += 0.3f;
+    if (deg >= 360.0f)
+        deg = 0.0f;
+    trans = glm::translate(trans, glm::vec3(xdist, ydist, 0.0f));
+    trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+    vec = trans * vec;
+
+    //trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+    glUseProgram(m_shaderProgram);
+
+
+    unsigned int transformLoc = glGetUniformLocation(m_shaderProgram, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_texture2);
+
+    glBindVertexArray(m_VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    // Flush
+    glFlush();
+
+    // Swap
+    SwapBuffers();
+}
+
+void SimulationGLCanvas::DrawScene2()
 {
     // must always be here
     wxPaintDC dc(this);
@@ -555,6 +718,7 @@ void SimulationGLCanvas::DrawScene()
     float z = 6.0f;
     x = x + xdist;
     y = y + ydist;
+    
     /*
     glBegin(GL_QUADS);
     //glNormal3f(0.0f, 0.0f, z);
@@ -577,9 +741,16 @@ void SimulationGLCanvas::DrawScene()
     //glDrawArrays(GL_TRIANGLES, 0, 3);
     //glBindVertexArray(0);
 
-    glBindTexture(GL_TEXTURE_2D, m_textureID);
+    //glBindTexture(GL_TEXTURE_2D, m_texture1);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_texture2);
+
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+   
    // glBindTexture(GL_TEXTURE_2D, m_textureID);
     //glBindVertexArray(VAO);
     //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -603,8 +774,8 @@ void SimulationGLCanvas::OnIdle(wxIdleEvent& event)
     m_elapsedTime.QuadPart /= m_frequency.QuadPart; //Now determine the number of microseconds since last call of OnIdle()
     m_deltaSeconds = (double)m_elapsedTime.QuadPart / 1000000.0;
 
-    //Refresh(false);
-    //event.RequestMore();
+    Refresh(false);
+    event.RequestMore();
 }
 
 void SimulationGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
@@ -662,7 +833,7 @@ void SimulationGLCanvas::OnMouse(wxMouseEvent& event)
 }
 
 void SimulationGLCanvas::InitGL()
-{
+{    
     static const GLfloat light0_pos[4] = { -50.0f, 50.0f, 0.0f, 0.0f };
 
     // white light
@@ -704,10 +875,28 @@ void SimulationGLCanvas::InitGL()
         wxLogFatalError("Error: '%s'\n", glewGetErrorString(res));
     }
     InitGLScene();
-    m_textureID = LoadTexture("bricks_256by256.bmp");
+    //m_texture1 = LoadTexture("bricks_256by256.bmp");
+   // m_texture2 = LoadTexture("TestAlphaChannel.png");
+    //m_texture2 = LoadTexture("grass.png");
+    //m_texture2 = LoadTexture("Tylyn444.bmp");
 }
 
 void SimulationGLCanvas::InitGLScene()
+{  
+
+    m_animationScene = new AnimationScene();
+    m_animationScene->LoadObjects("animation1.data");    
+
+    //Load, compile and link the shaders
+    LoadShaders("texture2b.vert", "texture2b.frag");
+
+    // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
+    glUseProgram(m_shaderProgram);
+    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
+    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1); 
+}
+
+void SimulationGLCanvas::InitGLScene2()
 {
     float scale = 1.5f, z = 6.0f;
     // An array of 3 vectors which represents 3 vertices   
@@ -768,6 +957,29 @@ void SimulationGLCanvas::InitGLScene()
         -scale,  scale, z,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
 
+    //Trying C++11 initialization of dynamic variable
+    float* array{ new float[32] {
+        // positions          // colors           // texture coords
+         scale,  scale, z,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+         scale, -scale, z,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -scale, -scale, z,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -scale,  scale, z,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    } };
+
+    //Trying C++11 initialization of dynamic variable
+    float* array2 = new float[32] {
+        // positions          // colors           // texture coords
+         scale,  scale, z,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+         scale, -scale, z,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -scale, -scale, z,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -scale,  scale, z,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    };
+
+    //Also C++11 initialization of dynamic variable
+    int* a = new int[3]{ 1, 2, 3 };
+
+    for (int j = 0; j < 32; j++)
+        array[j] = vertices[j];
     unsigned int indices[] = {
     0, 1, 3, // first triangle
     1, 2, 3  // second triangle
@@ -783,7 +995,7 @@ void SimulationGLCanvas::InitGLScene()
     glBindVertexArray(VAO);
     // 2. copy our vertices array in a vertex buffer for OpenGL to use
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), array, GL_STATIC_DRAW);
     // 3. copy our index array in a element buffer for OpenGL to use
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -805,7 +1017,14 @@ void SimulationGLCanvas::InitGLScene()
     m_VAO = VAO;
 
     //CompileLinkShaders();
-    LoadShaders("texture2.vert", "texture2.frag");
+    LoadShaders("texture2b.vert", "texture2b.frag");
+
+    // tell opengl for each sampler to which texture unit it sbelongs to (only has to be done once)
+    glUseProgram(m_shaderProgram);
+    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
+    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);
+    //foo();
+    delete[] array;
 }
 
 void SimulationGLCanvas::ResetProjectionMode()

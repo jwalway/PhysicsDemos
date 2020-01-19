@@ -22,6 +22,7 @@
 #include "wx/splitter.h"
 #include <fstream>
 #include <sstream>
+#include "animations.h"
 
 #if wxUSE_ZLIB
 #include "wx/zstream.h"
@@ -79,7 +80,7 @@ public:
     SimulationGLCanvas* GetCanvas() { return m_canvas; }
 
     ~MyFrame();
-private:
+private:    
     wxButton* m_btn1 = nullptr;
     wxTextCtrl *m_txt1 = nullptr;
     wxListBox *m_list1 = nullptr;
@@ -116,7 +117,7 @@ public:
     virtual ~SimulationGLCanvas();
 
     void LoadDXF(const wxString& filename);
-    void LoadShaders(const char* vertexFile,const char* fragmentFile);
+    void LoadShaders(const char* vertexFile,const char* fragmentFile); 
 
 protected:
     void OnPaint(wxPaintEvent& event);
@@ -124,23 +125,28 @@ protected:
     void OnEraseBackground(wxEraseEvent& event);
     void OnMouse(wxMouseEvent& event);
     void OnIdle(wxIdleEvent& event);
-    GLuint LoadTexture(const char* imagepath);
+    GLuint LoadTextureBMP(const char *imagepath);
+    GLuint LoadTexture(const char *imagepath);
 
 private:
     void InitGL();
     void ResetProjectionMode();
     void ResetOrthoMode();
     void InitGLScene();
+    void InitGLScene2();
     void DrawScene();
+    void DrawScene2();
+    void DrawScene3();
     unsigned int CompileShader(const char* filename, unsigned int shaderType);
     unsigned int LinkShaders(unsigned int vertex, unsigned int fragment);
 
     wxGLContext* m_glRC;
     GLData       m_gldata;
-    DXFRenderer  m_renderer;    
+    DXFRenderer  m_renderer; 
+    AnimationScene* m_animationScene;
     GLuint m_vertexbuffer=0; // This will identify our vertex buffer
     LARGE_INTEGER m_frequency, m_startTime, m_endTime, m_elapsedTime;
-    GLuint m_textureID;
+    GLuint m_texture1, m_texture2;
     unsigned int m_VBO;
     unsigned int m_VAO;
     unsigned int m_shaderProgram;

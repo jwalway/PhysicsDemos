@@ -74,7 +74,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(WXWIN)\include;$(WXWIN)\include\msvc</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(WXWIN)\include;$(WXWIN)\include\msvc;E:\Libraries\glm</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;$(WXWIN)\lib</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -143,12 +143,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="animations.h" />
     <ClInclude Include="dxfrenderer.h" />
+    <ClInclude Include="objectunit.h" />
     <ClInclude Include="physics.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="trackball.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="animations.cpp" />
     <ClCompile Include="dxfrenderer.cpp" />
+    <ClCompile Include="objectunit.cpp" />
     <ClCompile Include="physics.cpp" />
     <ClCompile Include="trackball.c" />
   </ItemGroup>
