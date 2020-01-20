@@ -149,7 +149,7 @@ private:
     GLuint m_texture1=0, m_texture2=0;
     unsigned int m_VBO;
     unsigned int m_VAO;
-    unsigned int m_shaderProgram;
+    unsigned int m_shaderProgram=0;
     double m_deltaSeconds = 0.0;
     wxDECLARE_NO_COPY_CLASS(SimulationGLCanvas);
     wxDECLARE_EVENT_TABLE();

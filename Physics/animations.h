@@ -16,7 +16,7 @@ class AnimationScene : public AnimationSceneBase {
 public:
 	//int LoadObjects(char *filename);
 	//void Draw(float deltaTime, unsigned int shaderProgram);
-	void Process(float deltaTime) {}
+	void Process(float deltaTime);
 	//virtual void RunScene() = 0;
 	void RunScene() {};
 	~AnimationScene() {}

@@ -64,14 +64,17 @@ void ObjectUnit::Calculate(float deltaTime)
     //Spring Force F = kx, or F= k * delta_d
     //I'll be applying a second order differential to determine the new position of the ball
     //Now using the gravitational equation (F = G m1*m2/r^2)
-    float GMM = 0.05f;
+    float GMM = 0.25f;
     float Force;
     //The point where the ball is supposed to be attracted. This can be seen as the location of a planet:
     glm::vec3 pointOfAttraction(0.0f, 0.0f, 0.0f);
+    pointOfAttraction = m_gravityWell;
     //The direction and distance of the force between the ball and "planet":
     glm::vec3 vf = pointOfAttraction - m_position;
     float len = glm::length(vf);
-    if (len > 0.05f) {
+   // if (len > 0.05f) {
+    if (len < 0.05f)
+        len = 0.05f;
         Force = GMM / (len * len); //(F = G m1 * m2 / r ^ 2)
         vf = glm::normalize(vf);
         //The resultant delta velocity of the ball due to the gravity force:
@@ -87,7 +90,7 @@ void ObjectUnit::Calculate(float deltaTime)
         m_position.x += dx;
         m_position.y += dy;
 
-    }
+   // }
 
     float rightWall = 1.0f, leftWall = -1.0f, topWall = 1.0f, bottomWall = -1.0f;
     float deltaWall = 0.1f;
@@ -143,8 +146,8 @@ void ObjectUnit::Draw(float deltaTime, unsigned int shaderProgram)
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_texture1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_texture2);
+    //glActiveTexture(GL_TEXTURE1);
+    //glBindTexture(GL_TEXTURE_2D, m_texture2);
 
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -162,7 +165,7 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
         objectData.pop_front();  
  
         if (elm == "<texture1>")
-        {
+        {            
             m_textureFile1 = objectData.front();
             m_texture1 = LoadTexture(m_textureFile1.c_str());
             objectData.pop_front();            
@@ -242,7 +245,20 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
                 m_velocity[idx++] = value;
             }
             objectData.pop_front(); // assume "</velocity>" exists and move to next element
-        }     
+        }
+        else if (elm == "<gravitywell>")
+        {
+            strData.str(""); strData.clear();
+            strData << objectData.front();
+            objectData.pop_front();
+            float value;
+            int idx = 0;
+            while (strData >> value)
+            {
+                m_gravityWell[idx++] = value;
+            }
+            objectData.pop_front(); 
+        }
     }
   return 1;
 }
@@ -256,7 +272,7 @@ GLuint ObjectUnit::LoadTexture(const char* imagepath)
 
     // "Bind" the newly created texture : all future texture functions will modify this texture
     glBindTexture(GL_TEXTURE_2D, textureID);
-    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    //stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
     // Give the image to OpenGL
     if (nrChannels == 3) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);

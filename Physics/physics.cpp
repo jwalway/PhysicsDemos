@@ -889,10 +889,10 @@ void SimulationGLCanvas::InitGLScene()
 {  
     //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
     m_animationScene = new AnimationScene(); //Base class points the specialized scene for the splash screen
-    m_animationScene->LoadObjects("animation1.data");    
+    m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");    
 
     //Load, compile and link the shaders
-    LoadShaders("texture2b.vert", "texture2b.frag");
+    LoadShaders("..\\resources\\SplashScreen\\texture2b.vert", "..\\resources\\SplashScreen\\texture2b.frag");
 
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     glUseProgram(m_shaderProgram);

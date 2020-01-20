@@ -46,9 +46,10 @@ private:
 	int m_verticesSize;
 	int  *m_indices;
 	int m_indicesSize;
-	unsigned int m_texture1, m_texture2;
+	unsigned int m_texture1=0, m_texture2=0;
 	string m_textureFile1="", m_textureFile2="";
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
+	glm::vec3 m_gravityWell;
 
 };
