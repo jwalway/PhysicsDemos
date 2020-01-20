@@ -2,14 +2,22 @@
 #include "objectunit.h"
 
 
-class AnimationScene{
+class AnimationSceneBase {
 public:
-	int LoadObjects(char *filename);
+	int LoadObjects(char* filename);
 	void Draw(float deltaTime, unsigned int shaderProgram);
+	virtual void Process(float deltaTime) = 0;
+	virtual ~AnimationSceneBase() = 0;
+protected:
+	vector<ObjectBase*> m_objects;
+};
+
+class AnimationScene : public AnimationSceneBase {
+public:
+	//int LoadObjects(char *filename);
+	//void Draw(float deltaTime, unsigned int shaderProgram);
+	void Process(float deltaTime) {}
 	//virtual void RunScene() = 0;
 	void RunScene() {};
-	~AnimationScene();
-private:
-	vector<ObjectUnit *> m_objects;
-
+	~AnimationScene() {}
 };

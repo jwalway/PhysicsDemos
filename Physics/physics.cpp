@@ -887,8 +887,8 @@ void SimulationGLCanvas::InitGL()
 
 void SimulationGLCanvas::InitGLScene()
 {  
-
-    m_animationScene = new AnimationScene();
+    //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
+    m_animationScene = new AnimationScene(); //Base class points the specialized scene for the splash screen
     m_animationScene->LoadObjects("animation1.data");    
 
     //Load, compile and link the shaders

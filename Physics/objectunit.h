@@ -12,7 +12,17 @@
 
 using namespace std;
 
-class ObjectUnit {
+
+class ObjectBase {
+public:
+	virtual void Calculate(float deltaTime) = 0;
+	virtual void Draw(float deltaTime, unsigned int shaderProgram) = 0;
+	virtual int LoadObject(deque<string>& objectData) = 0;
+	virtual void InitObject() = 0;
+	virtual ~ObjectBase() = 0 {};
+};
+
+class ObjectUnit: public ObjectBase {
 public:
 
 	void InitObject();
@@ -24,10 +34,12 @@ public:
 	//void SetTexture(unsigned int texture) { m_texture = texture; }
 	int LoadObject(deque<string> &objectData);
 	void Draw(float deltaTime, unsigned int shaderProgram);
+	void Calculate(float deltaTime);
 	~ObjectUnit();
 protected:
 	GLuint LoadTexture(const char* imagepath);
 private:
+	glm::mat4 m_trans;
 	unsigned int m_VAO;
 	unsigned int m_shaderProgram;
 	float *m_vertices;
