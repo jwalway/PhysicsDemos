@@ -495,7 +495,11 @@ SimulationGLCanvas::~SimulationGLCanvas()
     delete m_glRC;
 
     if (m_animationScene != nullptr)
-        delete m_animationScene; 
+        delete m_animationScene;
+    unsigned int txts[2] = { m_texture1, m_texture2 };
+    //I have a memory leak on textures which I can't solve 1/19/20, 2:45 p.m.
+    // Is texture release being delayed?
+   // glDeleteTextures(2,txts);
 }
 
 void SimulationGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
@@ -876,7 +880,7 @@ void SimulationGLCanvas::InitGL()
     }
     InitGLScene();
     //m_texture1 = LoadTexture("bricks_256by256.bmp");
-   // m_texture2 = LoadTexture("TestAlphaChannel.png");
+    //m_texture2 = LoadTexture("TestAlphaChannel.png");
     //m_texture2 = LoadTexture("grass.png");
     //m_texture2 = LoadTexture("Tylyn444.bmp");
 }
@@ -957,6 +961,7 @@ void SimulationGLCanvas::InitGLScene2()
         -scale,  scale, z,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
 
+    /*
     //Trying C++11 initialization of dynamic variable
     float* array{ new float[32] {
         // positions          // colors           // texture coords
@@ -977,9 +982,11 @@ void SimulationGLCanvas::InitGLScene2()
 
     //Also C++11 initialization of dynamic variable
     int* a = new int[3]{ 1, 2, 3 };
+    
 
     for (int j = 0; j < 32; j++)
         array[j] = vertices[j];
+    */
     unsigned int indices[] = {
     0, 1, 3, // first triangle
     1, 2, 3  // second triangle
@@ -995,7 +1002,7 @@ void SimulationGLCanvas::InitGLScene2()
     glBindVertexArray(VAO);
     // 2. copy our vertices array in a vertex buffer for OpenGL to use
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), array, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     // 3. copy our index array in a element buffer for OpenGL to use
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -1024,7 +1031,7 @@ void SimulationGLCanvas::InitGLScene2()
     glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
     glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);
     //foo();
-    delete[] array;
+   // delete[] array;
 }
 
 void SimulationGLCanvas::ResetProjectionMode()

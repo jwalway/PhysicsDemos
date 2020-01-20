@@ -146,7 +146,7 @@ private:
     AnimationScene* m_animationScene;
     GLuint m_vertexbuffer=0; // This will identify our vertex buffer
     LARGE_INTEGER m_frequency, m_startTime, m_endTime, m_elapsedTime;
-    GLuint m_texture1, m_texture2;
+    GLuint m_texture1=0, m_texture2=0;
     unsigned int m_VBO;
     unsigned int m_VAO;
     unsigned int m_shaderProgram;

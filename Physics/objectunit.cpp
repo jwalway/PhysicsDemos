@@ -6,8 +6,7 @@
 
 //Initializes object for rendering
 void ObjectUnit::InitObject()
-{
-    return;
+{   
     unsigned int VBO, VAO, EBO;
     // Generate 1 buffer, put the resulting identifier in vertexbuffer
    // glGenBuffers(1, &m_vertexbuffer);
@@ -57,90 +56,82 @@ void ObjectUnit::InitObject()
 }
 
 void ObjectUnit::Draw(float deltaTime, unsigned int shaderProgram)
-{
-    return;
+{    
     float dx = 0.0f, dy = 0.0f;
     float velx = 0.2f, vely = 0.2f;
-    dx = m_velocity.x * deltaTime; // velx* deltaTime;
-    dy = m_velocity.y * deltaTime; // vely* deltaTime;
-    m_position.x += dx;
-    m_position.y += dy;
+    
+    
+    //Spring Force F = kx, or F= k * delta_d
+    //I'll be applying a second order differential to determine the new position of the ball
+    //Now using the gravitational equation (F = G m1*m2/r^2)
+    float GMM = 0.05f;
+    float Force;
+    //The point where the ball is supposed to be attracted. This can be seen as the location of a planet:
+    glm::vec3 pointOfAttraction(0.0f, 0.0f, 0.0f); 
+    //The direction and distance of the force between the ball and "planet":
+    glm::vec3 vf = pointOfAttraction - m_position; 
+    float len = glm::length(vf);
+    if (len > 0.05f) {
+        Force = GMM / (len * len); //(F = G m1 * m2 / r ^ 2)
+        vf = glm::normalize(vf);
+        //The resultant delta velocity of the ball due to the gravity force:
+        vf = vf * Force * deltaTime;
+        //Add the delta velocity from the gravitational force
+        m_velocity += vf;
 
-    if (m_position.x > 1.0f)
+        //Calculate the delta positions
+        dx = m_velocity.x * deltaTime; // velx* deltaTime;
+        dy = m_velocity.y * deltaTime; // vely* deltaTime;
+
+        // Add the delta positions
+        m_position.x += dx;
+        m_position.y += dy;
+
+    }
+    
+    float rightWall=1.0f, leftWall=-1.0f, topWall=1.0f, bottomWall=-1.0f;
+    float deltaWall = 0.1f;
+
+    rightWall -= deltaWall;
+    leftWall += deltaWall;
+    topWall -= deltaWall;
+    bottomWall += deltaWall;
+
+
+
+    if (m_position.x > rightWall)
     {
-        m_position.x = 1.0f;
+        m_position.x = rightWall;
         m_velocity.x = m_velocity.x * -1.0f;
     }
-    if (m_position.x < -1.0f)
+    if (m_position.x < leftWall)
     {
-        m_position.x = -1.0f;
+        m_position.x = leftWall;
         m_velocity.x = m_velocity.x * -1.0f;
     }
 
-    if (m_position.y > 1.0f)
+    if (m_position.y > topWall)
     {
-        m_position.y = 1.0f;
+        m_position.y = topWall;
         m_velocity.y = m_velocity.y * -1.0f;
     }
-    if (m_position.y < -1.0f)
+    if (m_position.y < bottomWall)
     {
-        m_position.y = -1.0f;
+        m_position.y = bottomWall;
         m_velocity.y = m_velocity.y * -1.0f;
     }
-    /*
-    //SetCurrent(GetContext());
-    //SimulationGLCanvas& canvas = wxGetApp().GetContext
-   // wxGLCanvas::SetCurrent(*GetContext());
-    static float xdist = 0.0f, ydist = 0.0f;
-    static float signx = 1, signy = 1;
-
-    xdist += (float)dx * signx;
-    ydist += (float)dy * signy;
-
-    if (xdist > 1.0f) {
-        xdist = 1.0f;
-        signx = -1;
-    }
-    if (xdist < -1.0f) {
-        xdist = -1.0f;
-        signx = 1;
-    }
-    if (ydist > 1.0f) {
-        ydist = 1.0f;
-        signy = -1.0f;
-    }
-    if (ydist < -1.0f) {
-        ydist = -1.0f;
-        signy = 1.0f;
-    }
-
-
+    
     glm::vec4 vec(5.0f, 5.0f, 0.0f, 1.0f);
     glm::mat4 trans = glm::mat4(1.0f);
     static float deg = 0.0f;
-    deg += 0.3f;
-    if (deg >= 360.0f)
-        deg = 0.0f;
-    trans = glm::translate(trans, glm::vec3(xdist, ydist, 0.0f));
-    trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    vec = trans * vec;
-
-    //trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    glUseProgram(m_shaderProgram);
-
-    */
-
-    glm::vec4 vec(5.0f, 5.0f, 0.0f, 1.0f);
-    glm::mat4 trans = glm::mat4(1.0f);
-    static float deg = 0.0f;
-    deg += 0.3f;
+   // deg += 0.3f;
     if (deg >= 360.0f)
         deg = 0.0f;
     //trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
     trans = glm::translate(trans, glm::vec3(m_position.x, m_position.y, m_position.z));
     trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));    
+    //trans = glm::scale(trans, glm::vec3(0.25, 0.32, 1.0));    
+    trans = glm::scale(trans, glm::vec3(0.25*0.5, 0.32*0.5, 1.0));
 
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
@@ -177,8 +168,7 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             m_textureFile2 = objectData.front();
             m_texture2 = LoadTexture(m_textureFile2.c_str());
             objectData.pop_front();
-            objectData.pop_front(); //Assume "</texture2>" exists and move to next element 
-            return 0;
+            objectData.pop_front(); //Assume "</texture2>" exists and move to next element            
         }
         else if (elm == "<vertices>")
         {

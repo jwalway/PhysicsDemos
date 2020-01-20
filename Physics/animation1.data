@@ -1,0 +1,25 @@
+<object> 
+	<texture1>
+	bricks_256by256.bmp
+	</texture1>
+	<texture2>
+	s.png
+	</texture2>
+	<!-- Hello World!! -->
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 1.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 0.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 0.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 1.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 -0.5 0.0
+	</position>
+	<velocity>
+	1.5 -2.5 0.0
+	</velocity>
+</object> 
