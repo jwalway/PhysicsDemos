@@ -1,6 +1,6 @@
 <object> 
 	<texture1>
-	..\resources\SplashScreen\s.png
+	..\resources\SplashScreen\P.png
 	</texture1>	
 	<!-- Hello World!! -->
 	<vertices>
@@ -17,7 +17,7 @@
 	0.5 -0.5 0.0
 	</position>
 	<velocity>
-	0.5 -1.5 0.0
+	0.5 -0.15 0.0
 	</velocity>
 	<gravitywell>
 	0.0 0.0 0.0
@@ -25,7 +25,7 @@
 </object> 
 <object> 
 	<texture1>
-	..\resources\SplashScreen\p.png
+	..\resources\SplashScreen\H.png
 	</texture1>
 	<vertices>
 	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
@@ -41,7 +41,394 @@
 	0.5 0.5 0.0
 	</position>
 	<velocity>
-	0.2 1.0 0.0
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\Y.png
+	</texture1>	
+	<!-- Hello World!! -->
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 -0.5 0.0
+	</position>
+	<velocity>
+	0.5 -0.15 0.0
+	</velocity>
+	<gravitywell>
+	0.0 0.0 0.0
+	</gravitywell>
+</object> 
+<object> 
+	<texture1>
+	..\resources\SplashScreen\S.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\I.png
+	</texture1>	
+	<!-- Hello World!! -->
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 -0.5 0.0
+	</position>
+	<velocity>
+	0.5 -0.15 0.0
+	</velocity>
+	<gravitywell>
+	0.0 0.0 0.0
+	</gravitywell>
+</object> 
+<object> 
+	<texture1>
+	..\resources\SplashScreen\C.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\S.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<!-- Sumulations! -->
+<object> 
+	<texture1>
+	..\resources\SplashScreen\S.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\I.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\M.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\U.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\L.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\A.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\T.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\I.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\O.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\N.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
+	</velocity>
+	<gravitywell>
+	-0.5 0.0 0.0
+	</gravitywell>
+</object>
+<object> 
+	<texture1>
+	..\resources\SplashScreen\S.png
+	</texture1>
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 0.5 0.0
+	</position>
+	<velocity>
+	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
 	-0.5 0.0 0.0

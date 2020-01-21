@@ -91,7 +91,43 @@ AnimationSceneBase::~AnimationSceneBase()
     }
 }
 
+float positiveDelta(float x1, float x2)
+{
+    if (x1 < x2)
+        return x2 - x1;
+    return x1 - x2;
+}
+
 void AnimationScene::Process(float deltaTime)
 {
-
+    /*
+    float ballDiameter = 0.1f;
+    vector<glm::vec3> positions;
+    vector<glm::vec3> velocities;
+    for (auto& x : m_objects) {
+        //1) Calculate the change of position and velocity for each project ignoring collisions
+        x->Calculate(deltaTime);
+        
+    }
+    //checking for all collisions is an O(n^2) process..  I'll use fast math check.
+    //2) Check for collisions.
+    int j = 1;
+    for (int i = 0; i < m_objects.size() - 1; i++)
+    {
+        j = i + 1;
+        ObjectUnit* ou1 = (ObjectUnit*)m_objects[i];
+        for (; j < m_objects.size(); j++) {
+            float dx, dy;            
+            ObjectUnit* ou2 = (ObjectUnit *)m_objects[j];
+            dx = positiveDelta(ou1->getPosition().x, ou2->getPosition().x);
+            dy = positiveDelta(ou1->getPosition().y, ou2->getPosition().y);
+            if (dx <= ballDiameter && dy <= ballDiameter)
+            {
+                //I'll call this a collision, just to lower processing requirements
+            }
+        }
+    }
+    
+    //3) If there is a collisions recalibrate the velocities.
+    */
 }

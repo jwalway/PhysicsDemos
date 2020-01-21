@@ -55,6 +55,7 @@ void ObjectUnit::InitObject()
     m_VAO = VAO;
 }
 
+/*
 void ObjectUnit::Calculate(float deltaTime)
 {
     float dx = 0.0f, dy = 0.0f;
@@ -72,25 +73,25 @@ void ObjectUnit::Calculate(float deltaTime)
     //The direction and distance of the force between the ball and "planet":
     glm::vec3 vf = pointOfAttraction - m_position;
     float len = glm::length(vf);
-   // if (len > 0.05f) {
+    // if (len > 0.05f) {
     if (len < 0.05f)
         len = 0.05f;
-        Force = GMM / (len * len); //(F = G m1 * m2 / r ^ 2)
-        vf = glm::normalize(vf);
-        //The resultant delta velocity of the ball due to the gravity force:
-        vf = vf * Force * deltaTime;
-        //Add the delta velocity from the gravitational force
-        m_velocity += vf;
+    Force = GMM / (len * len); //(F = G m1 * m2 / r ^ 2)
+    vf = glm::normalize(vf);
+    //The resultant delta velocity of the ball due to the gravity force:
+    vf = vf * Force * deltaTime;
+    //Add the delta velocity from the gravitational force
+    m_velocity += vf;
 
-        //Calculate the delta positions
-        dx = m_velocity.x * deltaTime; // velx* deltaTime;
-        dy = m_velocity.y * deltaTime; // vely* deltaTime;
+    //Calculate the delta positions
+    dx = m_velocity.x * deltaTime; // velx* deltaTime;
+    dy = m_velocity.y * deltaTime; // vely* deltaTime;
 
-        // Add the delta positions
-        m_position.x += dx;
-        m_position.y += dy;
+    // Add the delta positions
+    m_position.x += dx;
+    m_position.y += dy;
 
-   // }
+    // }
 
     float rightWall = 1.0f, leftWall = -1.0f, topWall = 1.0f, bottomWall = -1.0f;
     float deltaWall = 0.1f;
@@ -137,6 +138,98 @@ void ObjectUnit::Calculate(float deltaTime)
     trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
     m_trans = trans;
 }
+*/
+
+void ObjectUnit::Calculate(float deltaTime)
+{
+    float dx = 0.0f, dy = 0.0f;
+    float velx = 0.2f, vely = 0.2f;
+
+   // m_position = m_gravityWell;
+    if (deltaTime > 0.0125f)
+        deltaTime = 0.0125f;
+    //Spring Force F = kx, or F= k * delta_d
+    //I'll be applying a second order differential to determine the new position of the ball
+    //Now using the gravitational equation (F = G m1*m2/r^2)
+    float GMM = 0.025f;//0.125f;
+    float Force;
+    //The point where the ball is supposed to be attracted. This can be seen as the location of a planet:
+    glm::vec3 pointOfAttraction(0.0f, 0.0f, 0.0f);
+    pointOfAttraction = m_gravityWell;
+    //The direction and distance of the force between the ball and "planet":
+    glm::vec3 vf = pointOfAttraction - m_position;
+    float len = glm::length(vf);
+    if (len > 0.02f) {
+    //if (len < 0.05f)
+        len = 0.05f;
+        Force = GMM / (len * len); //(F = G m1 * m2 / r ^ 2)
+        vf = glm::normalize(vf);
+        //The resultant delta velocity of the ball due to the gravity force:
+        vf = vf * Force * deltaTime;
+        //Add the delta velocity from the gravitational force
+        m_velocity += vf;
+        //Subtract off some drag for each iteration 1:53 p.m. 1/21/20
+        //Calculate the delta positions
+        float dragValue=0.1f, dragX, dragY;
+        dragX = dragValue*m_velocity.x * deltaTime;
+        dragY = dragValue * m_velocity.y * deltaTime;
+        m_velocity.x -= dragX;
+        m_velocity.y -= dragY;
+        dx = m_velocity.x * deltaTime; // velx* deltaTime;
+        dy = m_velocity.y * deltaTime; // vely* deltaTime;
+
+        // Add the delta positions
+        m_position.x += dx;
+        m_position.y += dy;
+
+    }
+
+    float wallSize = 2.5f;
+    float rightWall = wallSize, leftWall = -wallSize, topWall = wallSize, bottomWall = -wallSize;
+    float deltaWall = 0.1f;
+    
+
+    rightWall -= deltaWall;
+    leftWall += deltaWall;
+    topWall -= deltaWall;
+    bottomWall += deltaWall;
+
+    if (m_position.x > rightWall)
+    {
+        m_position.x = rightWall;
+        m_velocity.x = m_velocity.x * -1.0f;
+    }
+    if (m_position.x < leftWall)
+    {
+        m_position.x = leftWall;
+        m_velocity.x = m_velocity.x * -1.0f;
+    }
+
+    if (m_position.y > topWall)
+    {
+        m_position.y = topWall;
+        m_velocity.y = m_velocity.y * -1.0f;
+    }
+    if (m_position.y < bottomWall)
+    {
+        m_position.y = bottomWall;
+        m_velocity.y = m_velocity.y * -1.0f;
+    }
+    
+    glm::vec4 vec(5.0f, 5.0f, 0.0f, 1.0f);
+    glm::mat4 trans = glm::mat4(1.0f);
+    static float deg = 0.0f;
+    // deg += 0.3f;
+    if (deg >= 360.0f)
+        deg = 0.0f;
+    //trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
+    trans = glm::translate(trans, glm::vec3(m_position.x, m_position.y, m_position.z));
+    trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
+   // trans = glm::scale(trans, glm::vec3(0.25, 0.32, 1.0));    
+    trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
+    m_trans = trans;
+}
+
 
 void ObjectUnit::Draw(float deltaTime, unsigned int shaderProgram)
 {  
@@ -248,6 +341,8 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
         }
         else if (elm == "<gravitywell>")
         {
+            static int count = 0;
+            static float posx = -0.75f, posy = 0.5f;
             strData.str(""); strData.clear();
             strData << objectData.front();
             objectData.pop_front();
@@ -257,6 +352,16 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             {
                 m_gravityWell[idx++] = value;
             }
+            count++;
+            if (count > 7) {
+                count = 1;
+                posx = -0.75f;
+                posy -= 0.5f;
+            }
+            m_gravityWell[0] = posx;
+            posx += 0.20f; // 0.15f; // 0.25f;
+            m_gravityWell[1] = posy;
+
             objectData.pop_front(); 
         }
     }

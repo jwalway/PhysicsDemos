@@ -35,6 +35,10 @@ public:
 	int LoadObject(deque<string> &objectData);
 	void Draw(float deltaTime, unsigned int shaderProgram);
 	void Calculate(float deltaTime);
+
+	glm::vec3 getVelocity() { return m_velocity; }
+	glm::vec3 getPosition() { return m_position; }
+	glm::vec3 getGravityWell() { return m_gravityWell; }
 	~ObjectUnit();
 protected:
 	GLuint LoadTexture(const char* imagepath);
