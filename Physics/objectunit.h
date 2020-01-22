@@ -55,5 +55,6 @@ private:
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
 	glm::vec3 m_gravityWell;
+	float m_inflateValue=0.5f;
 
 };

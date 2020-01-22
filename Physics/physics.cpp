@@ -149,7 +149,7 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     
     m_wrapsizer = new wxWrapSizer(wxHORIZONTAL);  
 
-    m_btn1 = new wxButton(m_panel, 10001, "Click Me", wxDefaultPosition, wxDefaultSize); 
+    m_btn1 = new wxButton(m_panel, 10001, "Run Again", wxDefaultPosition, wxDefaultSize); 
     m_txt1 = new wxTextCtrl(m_panel, 10002, "Text Goes Here", wxDefaultPosition, wxDefaultSize);
 
     m_btn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
@@ -182,7 +182,7 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
 
 void MyFrame::PopulateListBox()
 {
-    vector<string> topics = { "Uniform Acceleration", "Acceleration Due To Gravity", "Newton's First Law" };
+    vector<string> topics = { "Introduction", "Uniform Acceleration", "Acceleration Due To Gravity", "Newton's First Law" };
 
     for (int i = 0; i < topics.size(); i++)
         m_list->InsertItem(i, topics[i].c_str());
@@ -539,8 +539,9 @@ void SimulationGLCanvas::DrawScene()
     glLoadIdentity();
     glTranslatef(0.0f, 0.0f, -20.0f);
 
-    glUseProgram(m_shaderProgram);
-    m_animationScene->Draw(m_deltaSeconds, m_shaderProgram);    
+    //glUseProgram(m_shaderProgram);
+    //m_animationScene->UseShaderProgram();
+    m_animationScene->Draw(m_deltaSeconds);    
     
   // Flush
     glFlush();
@@ -886,6 +887,22 @@ void SimulationGLCanvas::InitGL()
 }
 
 void SimulationGLCanvas::InitGLScene()
+{
+    //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
+    m_animationScene = new AnimationScene(); //Base class points the specialized scene for the splash screen
+    m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");
+    m_animationScene->Initialize();
+    //Load, compile and link the shaders
+    //LoadShaders("..\\resources\\SplashScreen\\texture2b.vert", "..\\resources\\SplashScreen\\texture2b.frag");
+
+    // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
+    //glUseProgram(m_shaderProgram);
+    //glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
+    //glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);
+}
+
+
+void SimulationGLCanvas::InitGLScene3()
 {  
     //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
     m_animationScene = new AnimationScene(); //Base class points the specialized scene for the splash screen

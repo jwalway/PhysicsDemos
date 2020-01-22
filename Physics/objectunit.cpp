@@ -144,8 +144,9 @@ void ObjectUnit::Calculate(float deltaTime)
 {
     float dx = 0.0f, dy = 0.0f;
     float velx = 0.2f, vely = 0.2f;
+    bool inflate = true;
 
-   // m_position = m_gravityWell;
+    // m_position = m_gravityWell;
     if (deltaTime > 0.0125f)
         deltaTime = 0.0125f;
     //Spring Force F = kx, or F= k * delta_d
@@ -160,7 +161,8 @@ void ObjectUnit::Calculate(float deltaTime)
     glm::vec3 vf = pointOfAttraction - m_position;
     float len = glm::length(vf);
     if (len > 0.02f) {
-    //if (len < 0.05f)
+        inflate = false;
+        //if (len < 0.05f)
         len = 0.05f;
         Force = GMM / (len * len); //(F = G m1 * m2 / r ^ 2)
         vf = glm::normalize(vf);
@@ -170,8 +172,8 @@ void ObjectUnit::Calculate(float deltaTime)
         m_velocity += vf;
         //Subtract off some drag for each iteration 1:53 p.m. 1/21/20
         //Calculate the delta positions
-        float dragValue=0.1f, dragX, dragY;
-        dragX = dragValue*m_velocity.x * deltaTime;
+        float dragValue = 0.1f, dragX, dragY;
+        dragX = dragValue * m_velocity.x * deltaTime;
         dragY = dragValue * m_velocity.y * deltaTime;
         m_velocity.x -= dragX;
         m_velocity.y -= dragY;
@@ -187,7 +189,7 @@ void ObjectUnit::Calculate(float deltaTime)
     float wallSize = 2.5f;
     float rightWall = wallSize, leftWall = -wallSize, topWall = wallSize, bottomWall = -wallSize;
     float deltaWall = 0.1f;
-    
+
 
     rightWall -= deltaWall;
     leftWall += deltaWall;
@@ -215,18 +217,26 @@ void ObjectUnit::Calculate(float deltaTime)
         m_position.y = bottomWall;
         m_velocity.y = m_velocity.y * -1.0f;
     }
-    
+
     glm::vec4 vec(5.0f, 5.0f, 0.0f, 1.0f);
     glm::mat4 trans = glm::mat4(1.0f);
     static float deg = 0.0f;
+    float factor = 0.1f;
     // deg += 0.3f;
     if (deg >= 360.0f)
         deg = 0.0f;
     //trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
     trans = glm::translate(trans, glm::vec3(m_position.x, m_position.y, m_position.z));
     trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
-   // trans = glm::scale(trans, glm::vec3(0.25, 0.32, 1.0));    
-    trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
+    if (inflate) {
+        if (m_inflateValue < 1.0f) {
+            m_inflateValue += deltaTime * factor;
+        }
+        trans = glm::scale(trans, glm::vec3(0.25*m_inflateValue, 0.32*m_inflateValue, 1.0));    
+    }
+    else {
+        trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
+    }
     m_trans = trans;
 }
 

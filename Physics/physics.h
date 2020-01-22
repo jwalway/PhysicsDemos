@@ -134,6 +134,7 @@ private:
     void ResetOrthoMode();
     void InitGLScene();
     void InitGLScene2();
+    void InitGLScene3();
     void DrawScene();
     void DrawScene2();
     void DrawScene3();

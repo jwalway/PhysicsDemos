@@ -1,3 +1,9 @@
+<vertexshader>
+..\resources\SplashScreen\texture2b.vert
+</vertexshader>
+<fragmentshader>
+..\resources\SplashScreen\texture2b.frag
+</fragmentshader>
 <object> 
 	<texture1>
 	..\resources\SplashScreen\P.png
