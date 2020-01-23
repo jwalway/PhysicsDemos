@@ -117,14 +117,15 @@ public:
     virtual ~SimulationGLCanvas();
 
     void LoadDXF(const wxString& filename);
-    void LoadShaders(const char* vertexFile,const char* fragmentFile); 
+    void LoadShaders(const char* vertexFile,const char* fragmentFile);
+    void Replay() { m_animationScene->Replay(); }
 
 protected:
     void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
     void OnEraseBackground(wxEraseEvent& event);
     void OnMouse(wxMouseEvent& event);
-    void OnIdle(wxIdleEvent& event);
+    void OnIdle(wxIdleEvent& event);    
     GLuint LoadTextureBMP(const char *imagepath);
     GLuint LoadTexture(const char *imagepath);
 

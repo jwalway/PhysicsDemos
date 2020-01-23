@@ -18,6 +18,7 @@ public:
 	virtual void Calculate(float deltaTime) = 0;
 	virtual void Draw(float deltaTime, unsigned int shaderProgram) = 0;
 	virtual int LoadObject(deque<string>& objectData) = 0;
+	virtual void Replay() = 0;
 	virtual void InitObject() = 0;
 	virtual ~ObjectBase() = 0 {};
 };
@@ -35,6 +36,7 @@ public:
 	int LoadObject(deque<string> &objectData);
 	void Draw(float deltaTime, unsigned int shaderProgram);
 	void Calculate(float deltaTime);
+	void Replay();
 
 	glm::vec3 getVelocity() { return m_velocity; }
 	glm::vec3 getPosition() { return m_position; }
@@ -52,6 +54,8 @@ private:
 	int m_indicesSize;
 	unsigned int m_texture1=0, m_texture2=0;
 	string m_textureFile1="", m_textureFile2="";
+	glm::vec3 m_initPosition;
+	glm::vec3 m_initVelocity;
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
 	glm::vec3 m_gravityWell;

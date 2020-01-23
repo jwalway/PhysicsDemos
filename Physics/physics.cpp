@@ -100,8 +100,7 @@ wxEND_EVENT_TABLE()
 
 // MyFrame constructor
 MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
-    const wxSize& size, long style)
-    : wxFrame(frame, wxID_ANY, title, pos, size, style)
+    const wxSize& size, long style) : wxFrame(frame, wxID_ANY, title, pos, size, style)
 {
     SetIcon(wxICON(sample));
 
@@ -235,9 +234,8 @@ void MyFrame::OnButtonClicked(wxCommandEvent& evt)
 {
     //m_list1->AppendString(m_txt1->GetValue());
 
-    //int x = (evt.GetId() - 10000) % nFieldWidth;
-    //int y = (evt.GetId() - 10000) / nFieldWidth;
-
+    m_canvas->Replay();
+    /*
     if (evt.GetId() == 10001)
     {
         if (m_wrapsizer->GetItemCount() > 1)
@@ -254,6 +252,7 @@ void MyFrame::OnButtonClicked(wxCommandEvent& evt)
         //m_btn1->Unbind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
         //m_btn1->Unbind()
     }
+    */
     evt.Skip(); // Tells the system that the event has been handled.
 }
 

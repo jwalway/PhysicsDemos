@@ -11,7 +11,8 @@ public:
 	virtual void Process(float deltaTime) = 0;
 	void LoadShaders(const char* vertexFile, const char* fragmentFile);
 	virtual void Initialize()=0;
-	virtual ~AnimationSceneBase() = 0;
+	virtual void Replay() = 0;
+	virtual ~AnimationSceneBase() = 0;	
 	void UseShaderProgram() { glUseProgram(m_shaderProgram); }
 protected:
 	vector<ObjectBase*> m_objects;
@@ -26,6 +27,7 @@ public:
 	//void Draw(float deltaTime, unsigned int shaderProgram);
 	void Process(float deltaTime);
 	void Initialize();
+	void Replay();
 	//virtual void RunScene() = 0;
 	void RunScene() {};
 	~AnimationScene() {}

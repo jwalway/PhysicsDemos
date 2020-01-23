@@ -1,5 +1,6 @@
 #include "objectunit.h"
 #include <sstream>
+#include <time.h> 
 
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -147,12 +148,13 @@ void ObjectUnit::Calculate(float deltaTime)
     bool inflate = true;
 
     // m_position = m_gravityWell;
-    if (deltaTime > 0.0125f)
-        deltaTime = 0.0125f;
+    if (deltaTime > 0.0125f) {
+        deltaTime = 0.00125f;
+    }
     //Spring Force F = kx, or F= k * delta_d
     //I'll be applying a second order differential to determine the new position of the ball
     //Now using the gravitational equation (F = G m1*m2/r^2)
-    float GMM = 0.025f;//0.125f;
+    float GMM = 0.04f; // 0.025f;//0.125f;
     float Force;
     //The point where the ball is supposed to be attracted. This can be seen as the location of a planet:
     glm::vec3 pointOfAttraction(0.0f, 0.0f, 0.0f);
@@ -160,10 +162,10 @@ void ObjectUnit::Calculate(float deltaTime)
     //The direction and distance of the force between the ball and "planet":
     glm::vec3 vf = pointOfAttraction - m_position;
     float len = glm::length(vf);
-    if (len > 0.02f) {
+    if (len > 0.04f) {
         inflate = false;
         //if (len < 0.05f)
-        len = 0.05f;
+            len = 0.05f;
         Force = GMM / (len * len); //(F = G m1 * m2 / r ^ 2)
         vf = glm::normalize(vf);
         //The resultant delta velocity of the ball due to the gravity force:
@@ -186,7 +188,7 @@ void ObjectUnit::Calculate(float deltaTime)
 
     }
 
-    float wallSize = 2.5f;
+    float wallSize = 2.0f;
     float rightWall = wallSize, leftWall = -wallSize, topWall = wallSize, bottomWall = -wallSize;
     float deltaWall = 0.1f;
 
@@ -256,12 +258,30 @@ void ObjectUnit::Draw(float deltaTime, unsigned int shaderProgram)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
+//v is the vector to be given a random value.  And the range of values
+// is startRange to EndRange
+void RandomVec(glm::vec3& v,float startRange=-1.0f,float endRange=1.0f)
+{
+    if (startRange >= endRange) {
+        startRange = -1.0f;
+        endRange = 1.0f;
+    }
+
+    float scale = (endRange - startRange) / (float)RAND_MAX;
+
+    v.x = scale * (float)rand();
+    v.y = scale * (float)rand();
+    v.z = 0.0f;
+}
+
 int ObjectUnit::LoadObject(deque<string> &objectData)
 {   
     string elm;
     stringstream strData;
     vector<float> nums;
     vector<int> idxs;
+
+    srand(time(NULL));
     while(!objectData.empty())
     {
         elm = objectData.front();
@@ -334,6 +354,8 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             {
                 m_position[idx++] = value;
             }
+            RandomVec(m_position);
+            m_initPosition = m_position;
             objectData.pop_front(); // assume "</position>" exists and move to next element
         }      
         else if (elm == "<velocity>")
@@ -346,7 +368,9 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             while (strData >> value)
             {
                 m_velocity[idx++] = value;
-            }
+            }           
+            RandomVec(m_velocity);
+            m_initVelocity = m_velocity;
             objectData.pop_front(); // assume "</velocity>" exists and move to next element
         }
         else if (elm == "<gravitywell>")
@@ -399,6 +423,13 @@ GLuint ObjectUnit::LoadTexture(const char* imagepath)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     return textureID;
+}
+
+void ObjectUnit::Replay()
+{
+    m_inflateValue = 0.5f;
+    m_velocity = m_initVelocity;
+    m_position = m_initPosition;
 }
 
 ObjectUnit::~ObjectUnit()

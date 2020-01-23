@@ -175,6 +175,7 @@ void AnimationSceneBase::Draw(float deltaTime)
     for (auto& x : m_objects)
     {
         x->Draw(deltaTime, m_shaderProgram);
+       // break;
     }
 }
 
@@ -204,6 +205,12 @@ void AnimationScene::Initialize()
     glUseProgram(m_shaderProgram);
     glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
     glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);
+}
+
+void AnimationScene::Replay()
+{
+    for (auto& x : m_objects)
+        x->Replay();
 }
 
 void AnimationScene::Process(float deltaTime)
