@@ -39,6 +39,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "splashscene.h"
+#include "collisionscene.h"
 
 using namespace std;
 
@@ -47,10 +49,6 @@ using namespace std;
 // ---------------------------------------------------------------------------
 
 
-enum class Splash
-{
-    List = 10000
-};
 
 // `Main program' equivalent, creating windows and returning main app frame
 bool MyApp::OnInit()
@@ -337,16 +335,19 @@ void SimulationGLCanvas::LoadScene(int sceneNumber)
         return;
     
     if (sceneNumber == 0) {
-        //SplashScreen
-        m_animationScene = make_unique<SplashScreenScene>();
-        m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");
+        //SplashScene
+        m_animationScene = make_unique<SplashScene>();
+        m_animationScene->LoadObjects("..\\resources\\SplashScene\\animation1.data");
         m_animationScene->Initialize();
         m_currentScene = sceneNumber;
     }
     else if (sceneNumber == 1) {
         //collision screen
-        m_animationScene = make_unique<SplashScreenScene>();
-        m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animationTest.data");
+        //m_animationScene = make_unique<SplashScene>();
+        //m_animationScene->LoadObjects("..\\resources\\SplashScene\\animationTest.data");
+        //m_animationScene->Initialize();
+        m_animationScene = make_unique<CollisionScene>();
+        m_animationScene->LoadObjects("..\\resources\\SplashScene\\animationTest.data");
         m_animationScene->Initialize();
         m_currentScene = sceneNumber;
        // m_animationScene = new CollisionScene();
@@ -693,9 +694,9 @@ void SimulationGLCanvas::InitGLScene()
 {
     //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
  
-    m_animationScene = make_unique<SplashScreenScene>();
-    m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");
-    //m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animationTest.data");
+    m_animationScene = make_unique<SplashScene>();
+    m_animationScene->LoadObjects("..\\resources\\SplashScene\\animation1.data");
+    //m_animationScene->LoadObjects("..\\resources\\SplashScene\\animationTest.data");
     m_animationScene->Initialize(); 
 }
 

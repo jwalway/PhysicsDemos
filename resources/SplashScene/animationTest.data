@@ -1,0 +1,31 @@
+<vertexshader>
+..\resources\SplashScene\texture2b.vert
+</vertexshader>
+<fragmentshader>
+..\resources\SplashScene\texture2b.frag
+</fragmentshader>
+<object> 
+	<texture1>
+	..\resources\SplashScene\P.png
+	</texture1>	
+	<!-- Hello World!! -->
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.5 -0.5 0.0
+	</position>
+	<velocity>
+	0.5 -0.15 0.0
+	</velocity>
+	<gravitywell>
+	0.0 0.0 0.0
+	</gravitywell>
+</object> 

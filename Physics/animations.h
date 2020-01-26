@@ -3,6 +3,14 @@
 #include "wx/wxprec.h"
 #include "GL/glew.h"
 #include <GL/glu.h> 
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <deque>
+#include "wx/defs.h"
+#include "wx/app.h"
+
+void trim(string& str, string trimchars = " \t\f\v\n\r");
 
 class AnimationSceneBase {
 public:
@@ -21,25 +29,4 @@ protected:
 	unsigned int LinkShaders(unsigned int vertex, unsigned int fragment);
 };
 
-class SplashScreenScene : public AnimationSceneBase {
-public:
-	int LoadObjects(char *filename);
-	//void Draw(float deltaTime, unsigned int shaderProgram);
-	void Process(float deltaTime);
-	void Initialize();
-	void Replay();
-	//virtual void RunScene() = 0;
-	void RunScene() {};
-	~SplashScreenScene();
-};
 
-class CollisionScene : public AnimationSceneBase {
-
-public:	
-	int LoadObjects(char* filename);
-	void Process(float deltaTime) {}
-	void Initialize() {}
-	void Replay() {}
-	void RunScene() {}
-	~CollisionScene() {}
-};

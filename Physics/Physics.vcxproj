@@ -110,6 +110,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_x64_lib;..\glew-2.1.0\lib\Release\x64</AdditionalLibraryDirectories>
       <AdditionalDependencies>glew32s.lib;Rpcrt4.lib;comctl32.lib;wxmsw30ud_adv.lib;wxmsw30ud_html.lib;wxbase30ud_xml.lib;wxmsw30ud_richtext.lib;wxmsw30ud_gl.lib;opengl32.lib;glu32.lib;wxmsw30ud_core.lib;wxbase30ud.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;wxzlibd.lib;wxregexud.lib;wxexpatd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,21 +147,26 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(WXWIN)\lib\vc_x64_lib;..\glew-2.1.0\lib\Release\x64</AdditionalLibraryDirectories>
       <AdditionalDependencies>glew32s.lib;Rpcrt4.lib;comctl32.lib;wxmsw30u_adv.lib;wxmsw30u_html.lib;wxbase30u_xml.lib;wxmsw30u_richtext.lib;wxmsw30u_gl.lib;opengl32.lib;glu32.lib;wxmsw30u_core.lib;wxbase30u.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="animations.h" />
+    <ClInclude Include="collisionscene.h" />
     <ClInclude Include="dxfrenderer.h" />
     <ClInclude Include="objectunit.h" />
     <ClInclude Include="physics.h" />
+    <ClInclude Include="splashscene.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="trackball.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="animations.cpp" />
+    <ClCompile Include="collisionscene.cpp" />
     <ClCompile Include="dxfrenderer.cpp" />
     <ClCompile Include="objectunit.cpp" />
     <ClCompile Include="physics.cpp" />
+    <ClCompile Include="splashscene.cpp" />
     <ClCompile Include="trackball.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
