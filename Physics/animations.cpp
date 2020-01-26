@@ -17,79 +17,6 @@ void trim(string &str, string trimchars = " \t\f\v\n\r")
     str.erase((end - start) + 1);    
 }
 
-int AnimationSceneBase::LoadObjects(char* filename)
-{
-    //Parsing xml *.data file for the animation scene
-    string dataElement;
-    string vertexShader="", fragmentShader="";
-    ifstream animationFile;
-    //std::stringstream shaderStream;
-    vector<string> dataElements;
-
-    animationFile.open(filename);
-    if (!animationFile) {
-        // wxMessageBox(wxString::Format("Was unable to open %s!", filename), wxT("Error"));
-        return -1;
-    }
-
-    while (std::getline(animationFile, dataElement))
-    {
-        trim(dataElement);
-        dataElements.push_back(dataElement);
-    }
-    animationFile.close();
-
-    //Sanity check of dataElements should be done  (no spaces between lines and matching tags should exist) 1/17/20
-    //I could also determine Object Type here from the first tag in the animation.data xml file 1/19/20, 10:15 p.m.
-
-    deque<string> objectData;
-
-    for (string& elm : dataElements)
-    {
-        if (elm == "<object>")
-        {
-            //Start of an object
-            objectData.clear();
-            objectData.push_back(elm);
-        }
-        else if (elm == "<vertexshader>")
-        {
-            objectData.clear();            
-        }
-        else if (elm == "</vertexshader>") {
-            vertexShader = objectData[0];
-        }
-        else if (elm == "<fragmentshader>")
-        {
-            objectData.clear();
-        }
-        else if (elm == "</fragmentshader>")
-        {
-            fragmentShader = objectData[0];
-        }
-        else if (elm.substr(0, 4) == "<!--")
-        { // skip comments
-            continue;
-        }
-        else if (elm == "</object>")
-        {
-            objectData.push_back(elm);
-            //create object and send data to it
-            ObjectUnit* objUnit = new ObjectUnit();
-            //ObjectBase* objBase = objUnit;
-            objUnit->LoadObject(objectData);
-            m_objects.push_back(objUnit);
-            //objUnit->InitObject();
-        }
-        else {
-            objectData.push_back(elm);
-        }
-    }
-
-    LoadShaders(vertexShader.c_str(), fragmentShader.c_str());
-
-    return 0;
-}
 
 void AnimationSceneBase::LoadShaders(const char* vertexFile, const char* fragmentFile)
 {
@@ -119,6 +46,10 @@ unsigned int AnimationSceneBase::LinkShaders(unsigned int vertex, unsigned int f
         return 0;
     }
     m_shaderProgram = shaderProgram;
+
+    //After creating program, the shader objects are no longer necessary
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
     return m_shaderProgram;
 }
 
@@ -170,21 +101,17 @@ unsigned int AnimationSceneBase::CompileShader(const char* filename, unsigned in
     return shaderObject;
 }
 void AnimationSceneBase::Draw(float deltaTime)
-{
-    UseShaderProgram();
+{  
+    UseShaderProgram(); 
     for (auto& x : m_objects)
     {
-        x->Draw(deltaTime, m_shaderProgram);
-       // break;
+        x->Draw(deltaTime, m_shaderProgram);               
     }
 }
 
 AnimationSceneBase::~AnimationSceneBase()
-{
-    for (auto& x : m_objects)
-    {
-        delete x;
-    }
+{    
+    glDeleteProgram(m_shaderProgram);
 }
 
 float positiveDelta(float x1, float x2)
@@ -194,26 +121,101 @@ float positiveDelta(float x1, float x2)
     return x1 - x2;
 }
 
-void AnimationScene::Initialize()
-{
+void SplashScreenScene::Initialize()
+{    
     for (auto& x : m_objects)
     {
         x->InitObject();
     }
-
+    
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     glUseProgram(m_shaderProgram);
     glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
-    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);
+    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);  
 }
 
-void AnimationScene::Replay()
+void SplashScreenScene::Replay()
 {
     for (auto& x : m_objects)
         x->Replay();
 }
 
-void AnimationScene::Process(float deltaTime)
+
+int SplashScreenScene::LoadObjects(char* filename)
+{
+    //Parsing xml *.data file for the animation scene
+    string dataElement;
+    string vertexShader = "", fragmentShader = "";
+    ifstream animationFile;
+    //std::stringstream shaderStream;
+    vector<string> dataElements;
+
+    animationFile.open(filename);
+    if (!animationFile) {
+        // wxMessageBox(wxString::Format("Was unable to open %s!", filename), wxT("Error"));
+        return -1;
+    }
+
+    while (std::getline(animationFile, dataElement))
+    {
+        trim(dataElement);
+        dataElements.push_back(dataElement);
+    }
+    animationFile.close();
+
+    //Sanity check of dataElements should be done  (no spaces between lines and matching tags should exist) 1/17/20
+    //I could also determine Object Type here from the first tag in the animation.data xml file 1/19/20, 10:15 p.m.
+
+    deque<string> objectData;
+
+    for (string& elm : dataElements)
+    {
+        if (elm == "<object>")
+        {
+            //Start of an object
+            objectData.clear();
+            objectData.push_back(elm);
+        }
+        else if (elm == "<vertexshader>")
+        {
+            objectData.clear();
+        }
+        else if (elm == "</vertexshader>") {
+            vertexShader = objectData[0];
+        }
+        else if (elm == "<fragmentshader>")
+        {
+            objectData.clear();
+        }
+        else if (elm == "</fragmentshader>")
+        {
+            fragmentShader = objectData[0];
+        }
+        else if (elm.substr(0, 4) == "<!--")
+        { // skip comments
+            continue;
+        }
+        else if (elm == "</object>")
+        {
+            objectData.push_back(elm);
+            //create object and send data to it
+            ObjectUnit* objUnit = new ObjectUnit();
+            //ObjectBase* objBase = objUnit;
+            objUnit->LoadObject(objectData);
+            m_objects.push_back(objUnit);
+            //objUnit->InitObject();
+        }
+        else {
+            objectData.push_back(elm);
+        }
+    } 
+    LoadShaders(vertexShader.c_str(), fragmentShader.c_str());
+
+    return 0;
+}
+
+
+void SplashScreenScene::Process(float deltaTime)
 {
     /*
     float ballDiameter = 0.1f;
@@ -245,4 +247,19 @@ void AnimationScene::Process(float deltaTime)
     
     //3) If there is a collisions recalibrate the velocities.
     */
+}
+
+SplashScreenScene::~SplashScreenScene()
+{
+    int val = (int)glGetError();
+    for (auto& x : m_objects)
+    {
+        delete x;
+    }
+}
+
+int CollisionScene::LoadObjects(char* filename)
+{
+
+    return 1;
 }

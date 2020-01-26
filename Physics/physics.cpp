@@ -47,14 +47,10 @@ using namespace std;
 // ---------------------------------------------------------------------------
 
 
-int foo()
+enum WidgetIDs
 {
-    glm::vec4 Position = glm::vec4(glm::vec3(0.0), 1.0);
-    glm::mat4 Model = glm::mat4(1.0);
-    Model[4] = glm::vec4(1.0, 1.0, 0.0, 1.0);
-    glm::vec4 Transformed = Model * Position;
-    return 0;
-}
+    LISTID = 10000
+};
 
 // `Main program' equivalent, creating windows and returning main app frame
 bool MyApp::OnInit()
@@ -89,7 +85,7 @@ IMPLEMENT_APP(MyApp) //Creates a WinMain() function and an instance of our MyApp
 // ---------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
-EVT_LIST_ITEM_SELECTED(wxID_ANY, MyFrame::OnSelectSubject)
+EVT_LIST_ITEM_SELECTED(LISTID, MyFrame::OnSelectSubject)
 EVT_MENU(wxID_OPEN, MyFrame::OnMenuFileOpen)
 EVT_MENU(wxID_EXIT, MyFrame::OnMenuFileExit)
 EVT_MENU(wxID_HELP, MyFrame::OnMenuHelpAbout)
@@ -132,7 +128,7 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
         wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN);
    
 
-    m_list = new wxListCtrl(splitter3, wxID_ANY, wxDefaultPosition, wxSize(200, 200),
+    m_list = new wxListCtrl(splitter3, LISTID, wxDefaultPosition, wxSize(200, 200),
         wxLC_REPORT | wxSUNKEN_BORDER);
     m_list->AppendColumn(wxT("Topics:"), wxLIST_FORMAT_LEFT, 200);
 
@@ -162,12 +158,10 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     splitter3->SplitHorizontally(m_list, m_richTextCtrl, 400);
     splitter3->SetMinimumPaneSize(100);
 
-
     splitter->SplitVertically(splitter2, splitter3, 550); 
     splitter->SetMinimumPaneSize(200);
     this->SetSizer(sizer);
     Show(true);
-
     PopulateListBox();
     wxImage::AddHandler(new wxPNGHandler);
     wxImage::AddHandler(new wxJPEGHandler);
@@ -177,6 +171,12 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
      //glGetIntegerv(GL_MINOR_VERSION, &min);
     //AnimationScene animate;
     //animate.LoadObjects("animation1.data");
+}
+
+void MyFrame::OnSelectItem(wxListEvent& event)
+{
+    int i = 0;
+    i++;
 }
 
 void MyFrame::PopulateListBox()
@@ -260,7 +260,7 @@ void MyFrame::OnButtonClicked(wxCommandEvent& evt)
 void MyFrame::OnSelectSubject(wxListEvent& event)
 {    
     int index = event.m_itemIndex;
- 
+    m_canvas->LoadScene(index);     
 }
 
 // File|Open... command
@@ -326,6 +326,37 @@ SimulationGLCanvas::SimulationGLCanvas(wxWindow* parent,
     trackball(m_gldata.quat, 0.0f, 0.0f, 0.0f, 0.0f);
     QueryPerformanceFrequency(&m_frequency);  //Get the base frequence for timer
     QueryPerformanceCounter(&m_startTime); //Initialize counter
+}
+
+void SimulationGLCanvas::LoadScene(int sceneNumber)
+{
+    //Note: I'm also going to have to take care of changing the front panels... 1/25/20, 8:42 p.m.
+    //The front panel could be changed in void MyFrame::OnSelectSubject(wxListEvent& event) after
+    //returning from this function (to confirm this function was successful.
+    if (m_currentScene == sceneNumber)
+        return;
+    
+    if (sceneNumber == 0) {
+        //SplashScreen        
+        if (m_animationScene != nullptr) {
+            delete m_animationScene;
+        }
+        m_animationScene = new SplashScreenScene();         
+        m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");
+        m_animationScene->Initialize();
+        m_currentScene = sceneNumber;
+    }
+    else if (sceneNumber == 1) {
+        //collision screen
+        if (m_animationScene != nullptr) {
+            delete m_animationScene;
+        }
+        m_animationScene = new SplashScreenScene();
+        m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animationTest.data");
+        m_animationScene->Initialize();
+        m_currentScene = sceneNumber;
+       // m_animationScene = new CollisionScene();
+    }
 }
 
 GLuint SimulationGLCanvas::LoadTexture(const char* imagepath)
@@ -491,8 +522,8 @@ unsigned int SimulationGLCanvas::LinkShaders(unsigned int vertex, unsigned int f
 
 SimulationGLCanvas::~SimulationGLCanvas()
 {
-    delete m_glRC;
-
+    delete m_glRC;  //This causes a 0x502 error (Invalid Operation), 1/25/20, 5:23 p.m.
+    int val = (int)glGetError();
     if (m_animationScene != nullptr)
         delete m_animationScene;
     unsigned int txts[2] = { m_texture1, m_texture2 };
@@ -888,8 +919,9 @@ void SimulationGLCanvas::InitGL()
 void SimulationGLCanvas::InitGLScene()
 {
     //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
-    m_animationScene = new AnimationScene(); //Base class points the specialized scene for the splash screen
+    m_animationScene = new SplashScreenScene(); //Base class points the specialized scene for the splash screen
     m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");
+    //m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animationTest.data");
     m_animationScene->Initialize();
     //Load, compile and link the shaders
     //LoadShaders("..\\resources\\SplashScreen\\texture2b.vert", "..\\resources\\SplashScreen\\texture2b.frag");
@@ -904,7 +936,7 @@ void SimulationGLCanvas::InitGLScene()
 void SimulationGLCanvas::InitGLScene3()
 {  
     //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
-    m_animationScene = new AnimationScene(); //Base class points the specialized scene for the splash screen
+    m_animationScene = new SplashScreenScene(); //Base class points the specialized scene for the splash screen
     m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");    
 
     //Load, compile and link the shaders

@@ -28,11 +28,11 @@ void ObjectUnit::InitObject()
     int theSize2 = sizeof(vertices);
 
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &VAO);
-    glGenBuffers(1, &EBO);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &EBO);    
     // ..:: Initialization code :: ..
     // 1. bind Vertex Array Object
-    glBindVertexArray(VAO);
+    glBindVertexArray(VAO);    
     // 2. copy our vertices array in a vertex buffer for OpenGL to use
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, m_verticesSize, m_vertices, GL_STATIC_DRAW);
@@ -54,6 +54,8 @@ void ObjectUnit::InitObject()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
     m_VAO = VAO;
+    m_VBO = VBO;
+    m_EBO = EBO;
 }
 
 /*
@@ -154,7 +156,7 @@ void ObjectUnit::Calculate(float deltaTime)
     //Spring Force F = kx, or F= k * delta_d
     //I'll be applying a second order differential to determine the new position of the ball
     //Now using the gravitational equation (F = G m1*m2/r^2)
-    float GMM = 0.04f; // 0.025f;//0.125f;
+    float GMM = 0.06f; // 0.025f;//0.125f;
     float Force;
     //The point where the ball is supposed to be attracted. This can be seen as the location of a planet:
     glm::vec3 pointOfAttraction(0.0f, 0.0f, 0.0f);
@@ -230,6 +232,7 @@ void ObjectUnit::Calculate(float deltaTime)
     //trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
     trans = glm::translate(trans, glm::vec3(m_position.x, m_position.y, m_position.z));
     trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
+    
     if (inflate) {
         if (m_inflateValue < 1.0f) {
             m_inflateValue += deltaTime * factor;
@@ -239,6 +242,7 @@ void ObjectUnit::Calculate(float deltaTime)
     else {
         trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
     }
+    
     m_trans = trans;
 }
 
@@ -386,16 +390,17 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             {
                 m_gravityWell[idx++] = value;
             }
+            
             count++;
             if (count > 7) {
                 count = 1;
                 posx = -0.75f;
                 posy -= 0.5f;
             }
-            m_gravityWell[0] = posx;
-            posx += 0.20f; // 0.15f; // 0.25f;
-            m_gravityWell[1] = posy;
-
+          //  m_gravityWell[0] = posx;
+         //   posx += 0.20f; // 0.15f; // 0.25f;
+          //  m_gravityWell[1] = posy;
+            
             objectData.pop_front(); 
         }
     }
@@ -437,8 +442,17 @@ ObjectUnit::~ObjectUnit()
     if (m_vertices != nullptr)
         delete m_vertices;
     if (m_indices != nullptr)
-        delete m_indices;
-
+        delete m_indices;  
+    int val = (int)glGetError();
     unsigned int texs[2] = { m_texture1, m_texture2 };
     glDeleteTextures(2, texs);
+    val = (int)glGetError();
+    glDeleteVertexArrays(1, &m_VAO);
+    val = (int)glGetError();
+    glDeleteBuffers(1, &m_VBO);
+    val = (int)glGetError();
+    glDeleteBuffers(1, &m_EBO);
+    val = (int)glGetError();
+    int i = 0;
+    i++;
 }

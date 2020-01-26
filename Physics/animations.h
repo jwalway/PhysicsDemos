@@ -6,14 +6,14 @@
 
 class AnimationSceneBase {
 public:
-	int LoadObjects(char* filename);
+	virtual int LoadObjects(char* filename) = 0;
 	void Draw(float deltaTime);
 	virtual void Process(float deltaTime) = 0;
 	void LoadShaders(const char* vertexFile, const char* fragmentFile);
 	virtual void Initialize()=0;
 	virtual void Replay() = 0;
 	virtual ~AnimationSceneBase() = 0;	
-	void UseShaderProgram() { glUseProgram(m_shaderProgram); }
+	void UseShaderProgram() { glUseProgram(m_shaderProgram); }	
 protected:
 	vector<ObjectBase*> m_objects;
 	unsigned int m_shaderProgram;
@@ -21,14 +21,25 @@ protected:
 	unsigned int LinkShaders(unsigned int vertex, unsigned int fragment);
 };
 
-class AnimationScene : public AnimationSceneBase {
+class SplashScreenScene : public AnimationSceneBase {
 public:
-	//int LoadObjects(char *filename);
+	int LoadObjects(char *filename);
 	//void Draw(float deltaTime, unsigned int shaderProgram);
 	void Process(float deltaTime);
 	void Initialize();
 	void Replay();
 	//virtual void RunScene() = 0;
 	void RunScene() {};
-	~AnimationScene() {}
+	~SplashScreenScene();
+};
+
+class CollisionScene : public AnimationSceneBase {
+
+public:	
+	int LoadObjects(char* filename);
+	void Process(float deltaTime) {}
+	void Initialize() {}
+	void Replay() {}
+	void RunScene() {}
+	~CollisionScene() {}
 };

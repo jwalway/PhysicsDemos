@@ -21,6 +21,7 @@ public:
 	virtual void Replay() = 0;
 	virtual void InitObject() = 0;
 	virtual ~ObjectBase() = 0 {};
+	virtual void print() = 0;
 };
 
 class ObjectUnit: public ObjectBase {
@@ -37,7 +38,10 @@ public:
 	void Draw(float deltaTime, unsigned int shaderProgram);
 	void Calculate(float deltaTime);
 	void Replay();
-
+	void print() {
+		int i = 0;
+		i++;
+	}
 	glm::vec3 getVelocity() { return m_velocity; }
 	glm::vec3 getPosition() { return m_position; }
 	glm::vec3 getGravityWell() { return m_gravityWell; }
@@ -47,6 +51,8 @@ protected:
 private:
 	glm::mat4 m_trans;
 	unsigned int m_VAO;
+	unsigned int m_VBO;
+	unsigned int m_EBO;
 	unsigned int m_shaderProgram;
 	float *m_vertices;
 	int m_verticesSize;

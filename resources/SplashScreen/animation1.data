@@ -26,7 +26,7 @@
 	0.5 -0.15 0.0
 	</velocity>
 	<gravitywell>
-	0.0 0.0 0.0
+	-0.75 0.5 0.0
 	</gravitywell>
 </object> 
 <object> 
@@ -50,7 +50,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.55 0.5 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -75,7 +75,7 @@
 	0.5 -0.15 0.0
 	</velocity>
 	<gravitywell>
-	0.0 0.0 0.0
+	-0.35 0.5 0.0
 	</gravitywell>
 </object> 
 <object> 
@@ -99,7 +99,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.15 0.5 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -124,7 +124,7 @@
 	0.5 -0.15 0.0
 	</velocity>
 	<gravitywell>
-	0.0 0.0 0.0
+	0.05 0.5 0.0
 	</gravitywell>
 </object> 
 <object> 
@@ -148,7 +148,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	0.25 0.5 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -172,7 +172,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	0.45 0.5 0.0
 	</gravitywell>
 </object>
 <!-- Sumulations! -->
@@ -197,7 +197,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.75 0.0 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -221,7 +221,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.55 0.0 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -245,7 +245,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.35 0.0 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -269,7 +269,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.15 0.0 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -293,7 +293,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	0.05 0.0 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -317,7 +317,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	0.25 0.0 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -341,7 +341,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	0.45 0.0 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -365,7 +365,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.75 -0.5 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -389,7 +389,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.55 -0.5 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -413,7 +413,7 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.35 -0.5 0.0
 	</gravitywell>
 </object>
 <object> 
@@ -437,6 +437,6 @@
 	0.2 0.4 0.0
 	</velocity>
 	<gravitywell>
-	-0.5 0.0 0.0
+	-0.15 -0.5 0.0
 	</gravitywell>
 </object>

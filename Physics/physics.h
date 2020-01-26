@@ -75,6 +75,8 @@ public:
     void OnMenuFileOpen(wxCommandEvent& event);
     void OnMenuFileExit(wxCommandEvent& event);
     void OnMenuHelpAbout(wxCommandEvent& event);
+    void OnSelectItem(wxListEvent& event);
+
 
     void SetCanvas(SimulationGLCanvas* canvas) { m_canvas = canvas; }
     SimulationGLCanvas* GetCanvas() { return m_canvas; }
@@ -119,13 +121,13 @@ public:
     void LoadDXF(const wxString& filename);
     void LoadShaders(const char* vertexFile,const char* fragmentFile);
     void Replay() { m_animationScene->Replay(); }
-
+    void LoadScene(int sceneNumber);
 protected:
     void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
     void OnEraseBackground(wxEraseEvent& event);
     void OnMouse(wxMouseEvent& event);
-    void OnIdle(wxIdleEvent& event);    
+    void OnIdle(wxIdleEvent& event);     
     GLuint LoadTextureBMP(const char *imagepath);
     GLuint LoadTexture(const char *imagepath);
 
@@ -149,6 +151,7 @@ private:
     GLuint m_vertexbuffer=0; // This will identify our vertex buffer
     LARGE_INTEGER m_frequency, m_startTime, m_endTime, m_elapsedTime;
     GLuint m_texture1=0, m_texture2=0;
+    int m_currentScene=0;
     unsigned int m_VBO;
     unsigned int m_VAO;
     unsigned int m_shaderProgram=0;
