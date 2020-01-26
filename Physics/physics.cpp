@@ -337,11 +337,7 @@ void SimulationGLCanvas::LoadScene(int sceneNumber)
         return;
     
     if (sceneNumber == 0) {
-        //SplashScreen        
-        if (m_animationScene != nullptr) {
-           // delete m_animationScene;
-        }
-        //m_animationScene = new SplashScreenScene();
+        //SplashScreen
         m_animationScene = make_unique<SplashScreenScene>();
         m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");
         m_animationScene->Initialize();
@@ -349,10 +345,6 @@ void SimulationGLCanvas::LoadScene(int sceneNumber)
     }
     else if (sceneNumber == 1) {
         //collision screen
-        if (m_animationScene != nullptr) {
-           // delete m_animationScene;
-        }
-        //m_animationScene = new SplashScreenScene();
         m_animationScene = make_unique<SplashScreenScene>();
         m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animationTest.data");
         m_animationScene->Initialize();
@@ -528,10 +520,7 @@ SimulationGLCanvas::~SimulationGLCanvas()
     int val = (int)glGetError();
     //if (m_animationScene != nullptr)
      //   delete m_animationScene;
-    unsigned int txts[2] = { m_texture1, m_texture2 };
-    //I have a memory leak on textures which I can't solve 1/19/20, 2:45 p.m.
-    // Is texture release being delayed?
-   // glDeleteTextures(2,txts);
+    unsigned int txts[2] = { m_texture1, m_texture2 }; 
 }
 
 void SimulationGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
@@ -570,228 +559,10 @@ void SimulationGLCanvas::DrawScene()
     // Transformations
     glLoadIdentity();
     glTranslatef(0.0f, 0.0f, -20.0f);
-
-    //glUseProgram(m_shaderProgram);
-    //m_animationScene->UseShaderProgram();
+        
     m_animationScene->Draw(m_deltaSeconds);    
     
   // Flush
-    glFlush();
-
-    // Swap
-    SwapBuffers();
-}
-
-void SimulationGLCanvas::DrawScene3()
-{
-    // must always be here
-    wxPaintDC dc(this);
-
-
-    SetCurrent(*m_glRC);
-
-    // Initialize OpenGL
-    if (!m_gldata.initialized)
-    {
-        InitGL();
-        //ResetProjectionMode();
-        ResetOrthoMode();
-        m_gldata.initialized = true;
-    }
-
-    double dx = 0.0, dy = 0.0;
-    double velx = 0.2, vely = 0.2;
-    dx = velx * m_deltaSeconds;
-    dy = vely * m_deltaSeconds;
-    //SetCurrent(GetContext());
-    //SimulationGLCanvas& canvas = wxGetApp().GetContext
-   // wxGLCanvas::SetCurrent(*GetContext());
-    static float xdist = 0.0f, ydist = 0.0f;
-    static float signx = 1, signy = 1;
-
-    xdist += (float)dx * signx;
-    ydist += (float)dy * signy;
-
-    if (xdist > 1.0f) {
-        xdist = 1.0f;
-        signx = -1;
-    }
-    if (xdist < -1.0f) {
-        xdist = -1.0f;
-        signx = 1;
-    }
-    if (ydist > 1.0f) {
-        ydist = 1.0f;
-        signy = -1.0f;
-    }
-    if (ydist < -1.0f) {
-        ydist = -1.0f;
-        signy = 1.0f;
-    }
-    glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Transformations
-    glLoadIdentity();
-    glTranslatef(xdist, 0.0f, -20.0f);
-
-    glm::vec4 vec(5.0f, 5.0f, 0.0f, 1.0f);
-    glm::mat4 trans = glm::mat4(1.0f);
-    static float deg = 0.0f;
-    deg += 0.3f;
-    if (deg >= 360.0f)
-        deg = 0.0f;
-    trans = glm::translate(trans, glm::vec3(xdist, ydist, 0.0f));
-    trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    vec = trans * vec;
-
-    //trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    glUseProgram(m_shaderProgram);
-
-
-    unsigned int transformLoc = glGetUniformLocation(m_shaderProgram, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_texture2);
-
-    glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    // Flush
-    glFlush();
-
-    // Swap
-    SwapBuffers();
-}
-
-void SimulationGLCanvas::DrawScene2()
-{
-    // must always be here
-    wxPaintDC dc(this);
-    double dx=0.0, dy=0.0;
-    double velx = 1.0, vely = 1.0;
-    dx = velx*m_deltaSeconds;
-    dy = vely * m_deltaSeconds;
-    //SetCurrent(GetContext());
-    //SimulationGLCanvas& canvas = wxGetApp().GetContext
-   // wxGLCanvas::SetCurrent(*GetContext());
-    static float xdist=0.0f, ydist=0.0f;
-
-    xdist += (float)dx;
-    ydist += (float)dy;
-
-    if (xdist > 10.0f)
-        xdist = 0.0f;
-    if (ydist > 10.0f)
-        ydist = 0.0f;
-
-    SetCurrent(*m_glRC);
-
-    // Initialize OpenGL
-    if (!m_gldata.initialized)
-    {
-        InitGL();
-        //ResetProjectionMode();
-        ResetOrthoMode();
-        m_gldata.initialized = true;
-    }
-    static int count = 0;
-    count++;
-
-    // Clear
-    glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Transformations
-    glLoadIdentity();
-    glTranslatef(0.0f, 0.0f, -20.0f);
-    GLfloat m[4][4];
-    build_rotmatrix(m, m_gldata.quat);
-    glMultMatrixf(&m[0][0]);
-
-
-    //m_renderer.Render();
-
-    // 1st attribute buffer : vertices
-    /*
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
-    glVertexAttribPointer(
-        0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-        3,                  // size
-        GL_FLOAT,           // type
-        GL_FALSE,           // normalized?
-        0,                  // stride
-        (void*)0            // array buffer offset
-    );
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-    glDisableVertexAttribArray(0);
-    */
-
-    //Triangle using VBO... this code works! (1/15/20, 12:29 p.m.)
-    // VBO transfers data right to the graphics card.
-    /*
-    float scale = 0.5f, z = 6.0f;
-
-    static const GLfloat vertices[] = {
-        0.0, scale, z,  // middle top corner
-        -scale, -scale, z, // bottom left corner
-         scale,  -scale, z // bottom right corner
-    };
-
-    //
-    glEnableClientState(GL_VERTEX_ARRAY );
-    glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDisableClientState(GL_VERTEX_ARRAY);
-
-     */
-    float x = 1.0f, y = 1.0f;
-    float z = 6.0f;
-    x = x + xdist;
-    y = y + ydist;
-    
-    /*
-    glBegin(GL_QUADS);
-    //glNormal3f(0.0f, 0.0f, z);
-    glVertex3f(x, y, z);
-    glVertex3f(-x, y, z);
-    glVertex3f(-x, -y, z);
-    glVertex3f(x, -y, z);
-    glEnd();
-     */
-
-    //Texture tutorial
-
-   // int vertexColorLocation = glGetUniformLocation(m_shaderProgram, "ourColor");
-
-    // ..:: Drawing code (in render loop) :: ..
-    glUseProgram(m_shaderProgram);
-   // glUniform4f(vertexColorLocation, 0.0f, 0.8f, 0.0f, 1.0f);
-   // glBindVertexArray(m_VAO);
-    //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-    //glDrawArrays(GL_TRIANGLES, 0, 3);
-    //glBindVertexArray(0);
-
-    //glBindTexture(GL_TEXTURE_2D, m_texture1);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_texture2);
-
-    glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-   
-   // glBindTexture(GL_TEXTURE_2D, m_textureID);
-    //glBindVertexArray(VAO);
-    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
- // Flush
     glFlush();
 
     // Swap
@@ -921,172 +692,11 @@ void SimulationGLCanvas::InitGL()
 void SimulationGLCanvas::InitGLScene()
 {
     //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
-    //unique_ptr<Entity> entity = make_unique<Entity>();
-    //unique_ptr<SplashScreenScene>
+ 
     m_animationScene = make_unique<SplashScreenScene>();
-    //m_animationScn->LoadObjects
-    //m_animationScene = new SplashScreenScene(); //Base class points the specialized scene for the splash screen
     m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");
     //m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animationTest.data");
-    m_animationScene->Initialize();
-    //Load, compile and link the shaders
-    //LoadShaders("..\\resources\\SplashScreen\\texture2b.vert", "..\\resources\\SplashScreen\\texture2b.frag");
-
-    // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-    //glUseProgram(m_shaderProgram);
-    //glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
-    //glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);
-}
-
-
-void SimulationGLCanvas::InitGLScene3()
-{  
-    //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
-    //m_animationScene = new SplashScreenScene(); //Base class points the specialized scene for the splash screen
-    m_animationScene = make_unique<SplashScreenScene>();
-    m_animationScene->LoadObjects("..\\resources\\SplashScreen\\animation1.data");    
-
-    //Load, compile and link the shaders
-    LoadShaders("..\\resources\\SplashScreen\\texture2b.vert", "..\\resources\\SplashScreen\\texture2b.frag");
-
-    // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-    glUseProgram(m_shaderProgram);
-    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
-    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1); 
-}
-
-void SimulationGLCanvas::InitGLScene2()
-{
-    float scale = 1.5f, z = 6.0f;
-    // An array of 3 vectors which represents 3 vertices   
-    static const GLfloat g_vertex_buffer_data[] = {
-       -scale, -scale, z,
-       scale, -scale, z,
-       0.0f,  scale, z
-    };
-   
-    // Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glGenBuffers(1, &m_vertexbuffer);
-    // The following commands will talk about our 'vertexbuffer' buffer
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
-    // Give our vertices to OpenGL.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-
-    //shape for texturing
-    //unsigned int VBO;
-
-  
-
-    /*float vertices[] = {
-    -scale, -scale, z,
-     scale, -scale, z,
-     0.0,  scale, z
-    };*/
-
-    scale = 0.5;
-   z = 0.0f;
-    /*
-    float vertices[] = {
-     scale,  scale, z,  // top right
-     scale, -scale, z,  // bottom right
-    -scale, -scale, z,  // bottom left
-    -scale,  scale, z   // top left 
-    };
-    
-    unsigned int indices[] = {  // note that we start from 0!
-    0, 1, 3,   // first triangle
-    1, 2, 3    // second triangle
-    };
-    */
-
-   /*
-    float vertices[] = {
-        // positions         // colors
-         scale, -scale, z,  1.0f, 0.0f, 0.0f,   // bottom right
-        -scale, -scale, z,  0.0f, 1.0f, 0.0f,   // bottom left
-         0.0f,  scale, z,  0.0f, 0.0f, 1.0f    // top 
-    };
-    */
-    float vertices[] = {
-        // positions          // colors           // texture coords
-         scale,  scale, z,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         scale, -scale, z,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -scale, -scale, z,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -scale,  scale, z,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-    };
-
-    /*
-    //Trying C++11 initialization of dynamic variable
-    float* array{ new float[32] {
-        // positions          // colors           // texture coords
-         scale,  scale, z,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         scale, -scale, z,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -scale, -scale, z,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -scale,  scale, z,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-    } };
-
-    //Trying C++11 initialization of dynamic variable
-    float* array2 = new float[32] {
-        // positions          // colors           // texture coords
-         scale,  scale, z,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         scale, -scale, z,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -scale, -scale, z,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -scale,  scale, z,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-    };
-
-    //Also C++11 initialization of dynamic variable
-    int* a = new int[3]{ 1, 2, 3 };
-    
-
-    for (int j = 0; j < 32; j++)
-        array[j] = vertices[j];
-    */
-    unsigned int indices[] = {
-    0, 1, 3, // first triangle
-    1, 2, 3  // second triangle
-    };
-
-    unsigned int VBO, VAO, EBO;
-
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &VAO);
-    glGenBuffers(1, &EBO);
-// ..:: Initialization code :: ..
-// 1. bind Vertex Array Object
-    glBindVertexArray(VAO);
-    // 2. copy our vertices array in a vertex buffer for OpenGL to use
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    // 3. copy our index array in a element buffer for OpenGL to use
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    // 4. then set the vertex attributes pointers
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // texture attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    m_VAO = VAO;
-
-    //CompileLinkShaders();
-    LoadShaders("texture2b.vert", "texture2b.frag");
-
-    // tell opengl for each sampler to which texture unit it sbelongs to (only has to be done once)
-    glUseProgram(m_shaderProgram);
-    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
-    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);
-    //foo();
-   // delete[] array;
+    m_animationScene->Initialize(); 
 }
 
 void SimulationGLCanvas::ResetProjectionMode()

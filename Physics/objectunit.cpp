@@ -9,23 +9,6 @@
 void ObjectUnit::InitObject()
 {   
     unsigned int VBO, VAO, EBO;
-    // Generate 1 buffer, put the resulting identifier in vertexbuffer
-   // glGenBuffers(1, &m_vertexbuffer);
-    // The following commands will talk about our 'vertexbuffer' buffer
-  //  glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
-    // Give our vertices to OpenGL.
-  //  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-    
-    float scale = 0.5f, z = 0.0f;
-    float vertices[] = {
-        // positions          // colors           // texture coords
-         scale,  scale, z,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         scale, -scale, z,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -scale, -scale, z,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -scale,  scale, z,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-    };
-    int theSize = sizeof(m_vertices);
-    int theSize2 = sizeof(vertices);
 
     glGenBuffers(1, &VBO);
     glGenVertexArrays(1, &VAO);
@@ -39,9 +22,7 @@ void ObjectUnit::InitObject()
     // 3. copy our index array in a element buffer for OpenGL to use
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indicesSize, m_indices, GL_STATIC_DRAW);
-    // 4. then set the vertex attributes pointers
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
+    // 4. then set the vertex attributes pointers    
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -58,90 +39,6 @@ void ObjectUnit::InitObject()
     m_EBO = EBO;
 }
 
-/*
-void ObjectUnit::Calculate(float deltaTime)
-{
-    float dx = 0.0f, dy = 0.0f;
-    float velx = 0.2f, vely = 0.2f;
-
-
-    //Spring Force F = kx, or F= k * delta_d
-    //I'll be applying a second order differential to determine the new position of the ball
-    //Now using the gravitational equation (F = G m1*m2/r^2)
-    float GMM = 0.25f;
-    float Force;
-    //The point where the ball is supposed to be attracted. This can be seen as the location of a planet:
-    glm::vec3 pointOfAttraction(0.0f, 0.0f, 0.0f);
-    pointOfAttraction = m_gravityWell;
-    //The direction and distance of the force between the ball and "planet":
-    glm::vec3 vf = pointOfAttraction - m_position;
-    float len = glm::length(vf);
-    // if (len > 0.05f) {
-    if (len < 0.05f)
-        len = 0.05f;
-    Force = GMM / (len * len); //(F = G m1 * m2 / r ^ 2)
-    vf = glm::normalize(vf);
-    //The resultant delta velocity of the ball due to the gravity force:
-    vf = vf * Force * deltaTime;
-    //Add the delta velocity from the gravitational force
-    m_velocity += vf;
-
-    //Calculate the delta positions
-    dx = m_velocity.x * deltaTime; // velx* deltaTime;
-    dy = m_velocity.y * deltaTime; // vely* deltaTime;
-
-    // Add the delta positions
-    m_position.x += dx;
-    m_position.y += dy;
-
-    // }
-
-    float rightWall = 1.0f, leftWall = -1.0f, topWall = 1.0f, bottomWall = -1.0f;
-    float deltaWall = 0.1f;
-
-    rightWall -= deltaWall;
-    leftWall += deltaWall;
-    topWall -= deltaWall;
-    bottomWall += deltaWall;
-
-
-
-    if (m_position.x > rightWall)
-    {
-        m_position.x = rightWall;
-        m_velocity.x = m_velocity.x * -1.0f;
-    }
-    if (m_position.x < leftWall)
-    {
-        m_position.x = leftWall;
-        m_velocity.x = m_velocity.x * -1.0f;
-    }
-
-    if (m_position.y > topWall)
-    {
-        m_position.y = topWall;
-        m_velocity.y = m_velocity.y * -1.0f;
-    }
-    if (m_position.y < bottomWall)
-    {
-        m_position.y = bottomWall;
-        m_velocity.y = m_velocity.y * -1.0f;
-    }
-
-    glm::vec4 vec(5.0f, 5.0f, 0.0f, 1.0f);
-    glm::mat4 trans = glm::mat4(1.0f);
-    static float deg = 0.0f;
-    // deg += 0.3f;
-    if (deg >= 360.0f)
-        deg = 0.0f;
-    //trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
-    trans = glm::translate(trans, glm::vec3(m_position.x, m_position.y, m_position.z));
-    trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
-    //trans = glm::scale(trans, glm::vec3(0.25, 0.32, 1.0));    
-    trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
-    m_trans = trans;
-}
-*/
 
 void ObjectUnit::Calculate(float deltaTime)
 {

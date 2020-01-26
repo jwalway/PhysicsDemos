@@ -135,12 +135,8 @@ private:
     void InitGL();
     void ResetProjectionMode();
     void ResetOrthoMode();
-    void InitGLScene();
-    void InitGLScene2();
-    void InitGLScene3();
+    void InitGLScene();    
     void DrawScene();
-    void DrawScene2();
-    void DrawScene3();
     unsigned int CompileShader(const char* filename, unsigned int shaderType);
     unsigned int LinkShaders(unsigned int vertex, unsigned int fragment);
 
