@@ -283,8 +283,8 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
     string elm;
     stringstream strData;
     vector<float> nums;
-    vector<int> idxs;
-
+    vector<int> idxs;   
+    //return 0;
     srand(time(NULL));
     while(!objectData.empty())
     {
@@ -292,7 +292,7 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
         objectData.pop_front();  
  
         if (elm == "<texture1>")
-        {            
+        {           
             m_textureFile1 = objectData.front();
             m_texture1 = LoadTexture(m_textureFile1.c_str());
             objectData.pop_front();            
@@ -306,7 +306,7 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             objectData.pop_front(); //Assume "</texture2>" exists and move to next element            
         }
         else if (elm == "<vertices>")
-        {
+        {           
             nums.clear();
             while(objectData.front() != "</vertices>")
             {
@@ -327,7 +327,7 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             m_verticesSize = (int)nums.size()* sizeof(float);
         }    
         else if (elm == "<indices>")
-        {
+        {            
             idxs.clear();
             while (objectData.front() != "</indices>")
             {
@@ -411,7 +411,8 @@ GLuint ObjectUnit::LoadTexture(const char* imagepath)
 {   
     int width, height, nrChannels;
     unsigned char* data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
-    GLuint textureID;
+    GLuint textureID;   
+
     glGenTextures(1, &textureID);
 
     // "Bind" the newly created texture : all future texture functions will modify this texture
@@ -427,6 +428,7 @@ GLuint ObjectUnit::LoadTexture(const char* imagepath)
     }
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    stbi_image_free(data);
     return textureID;
 }
 
