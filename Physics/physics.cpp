@@ -347,7 +347,7 @@ void SimulationGLCanvas::LoadScene(int sceneNumber)
         //m_animationScene->LoadObjects("..\\resources\\SplashScene\\animationTest.data");
         //m_animationScene->Initialize();
         m_animationScene = make_unique<CollisionScene>();
-        m_animationScene->LoadObjects("..\\resources\\SplashScene\\animationTest.data");
+        m_animationScene->LoadObjects("..\\resources\\CollisionScene\\collision.data");
         m_animationScene->Initialize();
         m_currentScene = sceneNumber;
        // m_animationScene = new CollisionScene();

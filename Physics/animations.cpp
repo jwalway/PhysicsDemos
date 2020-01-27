@@ -95,6 +95,7 @@ unsigned int AnimationSceneBase::CompileShader(const char* filename, unsigned in
     }
     return shaderObject;
 }
+/*
 void AnimationSceneBase::Draw(float deltaTime)
 {  
     UseShaderProgram(); 
@@ -103,6 +104,7 @@ void AnimationSceneBase::Draw(float deltaTime)
         x->Draw(deltaTime, m_shaderProgram);               
     }
 }
+*/
 
 AnimationSceneBase::~AnimationSceneBase()
 {    

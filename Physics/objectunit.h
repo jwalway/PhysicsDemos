@@ -20,8 +20,32 @@ public:
 	virtual int LoadObject(deque<string>& objectData) = 0;
 	virtual void Replay() = 0;
 	virtual void InitObject() = 0;
-	virtual ~ObjectBase() = 0 {};
-	virtual void print() = 0;
+	virtual ~ObjectBase() = 0 {};	
+};
+
+class BackgroundObject : public ObjectBase
+{
+public:
+	void Calculate(float deltaTime);
+	void Draw(float deltaTime, unsigned int shaderProgram);
+	int LoadObject(deque<string>& objectData);
+	GLuint LoadTexture(const char* imagepath);
+	void Replay() {};
+	void InitObject();
+	~BackgroundObject();
+private:
+	glm::mat4 m_trans;
+	unsigned int m_VAO;
+	unsigned int m_VBO;
+	unsigned int m_EBO;
+	unsigned int m_shaderProgram;
+	float* m_vertices;
+	int m_verticesSize;
+	int* m_indices;
+	int m_indicesSize;
+	unsigned int m_texture1 = 0, m_texture2 = 0;
+	string m_textureFile1 = "", m_textureFile2 = "";
+	glm::vec3 m_position;
 };
 
 class ObjectUnit: public ObjectBase {
@@ -38,10 +62,6 @@ public:
 	void Draw(float deltaTime, unsigned int shaderProgram);
 	void Calculate(float deltaTime);
 	void Replay();
-	void print() {
-		int i = 0;
-		i++;
-	}
 	glm::vec3 getVelocity() { return m_velocity; }
 	glm::vec3 getPosition() { return m_position; }
 	glm::vec3 getGravityWell() { return m_gravityWell; }
@@ -68,3 +88,4 @@ private:
 	float m_inflateValue=0.5f;
 
 };
+

@@ -15,7 +15,7 @@ void trim(string& str, string trimchars = " \t\f\v\n\r");
 class AnimationSceneBase {
 public:
 	virtual int LoadObjects(char* filename) = 0;
-	void Draw(float deltaTime);
+	virtual void Draw(float deltaTime) = 0;
 	virtual void Process(float deltaTime) = 0;
 	void LoadShaders(const char* vertexFile, const char* fragmentFile);
 	virtual void Initialize()=0;

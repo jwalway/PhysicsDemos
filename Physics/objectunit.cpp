@@ -355,3 +355,191 @@ ObjectUnit::~ObjectUnit()
     int i = 0;
     i++;
 }
+
+int BackgroundObject::LoadObject(deque<string>& objectData)
+{
+    string elm;
+    stringstream strData;
+    vector<float> nums;
+    vector<int> idxs;
+    //return 0;
+    srand(time(NULL));
+    while (!objectData.empty())
+    {
+        elm = objectData.front();
+        objectData.pop_front();
+
+        if (elm == "<texture1>")
+        {
+            m_textureFile1 = objectData.front();
+            m_texture1 = LoadTexture(m_textureFile1.c_str());
+            objectData.pop_front();
+            objectData.pop_front(); //Assume "</texture1>" exists and move to next element
+        }
+        if (elm == "<texture2>")
+        {
+            m_textureFile2 = objectData.front();
+            m_texture2 = LoadTexture(m_textureFile2.c_str());
+            objectData.pop_front();
+            objectData.pop_front(); //Assume "</texture2>" exists and move to next element            
+        }
+        else if (elm == "<vertices>")
+        {
+            nums.clear();
+            while (objectData.front() != "</vertices>")
+            {
+                strData.str(""); strData.clear();
+                strData << objectData.front();
+                float value;
+                while (strData >> value)
+                {
+                    nums.push_back(value);
+                }
+                objectData.pop_front();
+            }
+            objectData.pop_front();
+            //OpenGL requires an array
+            m_vertices = new float[nums.size()];
+            for (int i = 0; i < nums.size(); i++)
+                m_vertices[i] = nums[i];
+            m_verticesSize = (int)nums.size() * sizeof(float);
+        }
+        else if (elm == "<indices>")
+        {
+            idxs.clear();
+            while (objectData.front() != "</indices>")
+            {
+                strData.str(""); strData.clear();
+                strData << objectData.front();
+                int value;
+                while (strData >> value)
+                {
+                    idxs.push_back(value);
+                }
+                objectData.pop_front();
+            }
+            objectData.pop_front();
+            //OpenGL requires an array
+            m_indices = new int[idxs.size()];
+            for (int i = 0; i < idxs.size(); i++)
+                m_indices[i] = idxs[i];
+            m_indicesSize = (int)idxs.size() * sizeof(float);
+        }
+        else if (elm == "<position>")
+        {
+            strData.str(""); strData.clear();
+            strData << objectData.front();
+            objectData.pop_front();
+            float value;
+            int idx = 0;
+            while (strData >> value)
+            {
+                m_position[idx++] = value;
+            }
+            //RandomVec(m_position);            
+            objectData.pop_front(); // assume "</position>" exists and move to next element
+        }
+    }
+    return 1;
+}
+
+GLuint BackgroundObject::LoadTexture(const char* imagepath)
+{
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
+    GLuint textureID;
+
+    glGenTextures(1, &textureID);
+
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    //stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    // Give the image to OpenGL
+    if (nrChannels == 3) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+    }
+    else {
+        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    stbi_image_free(data);
+    return textureID;
+}
+
+//Initializes object for rendering
+void BackgroundObject::InitObject()
+{
+    unsigned int VBO, VAO, EBO;
+
+    glGenBuffers(1, &VBO);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &EBO);
+    // ..:: Initialization code :: ..
+    // 1. bind Vertex Array Object
+    glBindVertexArray(VAO);
+    // 2. copy our vertices array in a vertex buffer for OpenGL to use
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, m_verticesSize, m_vertices, GL_STATIC_DRAW);
+    // 3. copy our index array in a element buffer for OpenGL to use
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indicesSize, m_indices, GL_STATIC_DRAW);
+    // 4. then set the vertex attributes pointers    
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    m_VAO = VAO;
+    m_VBO = VBO;
+    m_EBO = EBO;
+}
+
+void BackgroundObject::Calculate(float deltaTime)
+{    
+    glm::mat4 trans = glm::mat4(1.0f);
+    static float deg = 0.0f;
+    
+    // deg += 0.3f;
+    if (deg >= 360.0f)
+        deg = 0.0f;
+    //trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
+    trans = glm::translate(trans, glm::vec3(m_position.x, m_position.y, m_position.z));
+    trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
+    //trans = glm::scale(trans, glm::vec3(0.25 , 0.32, 1.0));
+    trans = glm::scale(trans, glm::vec3(2.0f, 2.0f, 1.0f));
+    m_trans = trans;
+}
+
+void BackgroundObject::Draw(float deltaTime, unsigned int shaderProgram)
+{
+    Calculate(deltaTime);
+    unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(m_trans));
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture1);    
+
+    glBindVertexArray(m_VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+BackgroundObject::~BackgroundObject()
+{
+    if (m_vertices != nullptr)
+        delete m_vertices;
+    if (m_indices != nullptr)
+        delete m_indices;    
+    unsigned int texs[2] = { m_texture1, m_texture2 };
+    glDeleteTextures(2, texs);    
+    glDeleteVertexArrays(1, &m_VAO);    
+    glDeleteBuffers(1, &m_VBO);    
+    glDeleteBuffers(1, &m_EBO);
+}
