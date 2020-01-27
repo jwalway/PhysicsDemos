@@ -1,0 +1,24 @@
+<vertexshader>
+..\resources\CollisionScene\texture2b.vert
+</vertexshader>
+<fragmentshader>
+..\resources\CollisionScene\texture2b.frag
+</fragmentshader>
+<backgroundtexture> 
+	<texture1>
+	..\resources\CollisionScene\CanyonBeneathTheStars.jpg
+	</texture1>		
+	<vertices>
+	0.5  0.5 0.0   1.0 0.0 0.0   1.0 0.0
+	0.5 -0.5 0.0   0.0 1.0 0.0   1.0 1.0
+	-0.5 -0.5 0.0  0.0 0.0 1.0   0.0 1.0
+	-0.5 0.5 0.0   1.0 1.0 0.0   0.0 0.0 
+	</vertices>
+	<indices>
+	0 1 3
+	1 2 3
+	</indices>
+	<position>
+	0.0 0.0 0.0
+	</position>
+</backgroundtexture>

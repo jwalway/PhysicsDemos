@@ -1,10 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        physics.cpp
-// Purpose:     physics demo program
-// Author:      John  Alway
-// 
-// Created:     1/13/2020
-// Copyright:   (c) John Alway
+// Name:        Physics Demos Program
+// Purpose:     To Simulate Physics Principles
+// Author:      John Alway
+//
+// Created: 1/13/2020
+// Copyright 2020 John Alway. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE.TXT file.
 /////////////////////////////////////////////////////////////////////////////
 
 // For compilers that support precompilation, includes "wx.h".
