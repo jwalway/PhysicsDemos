@@ -25,6 +25,7 @@
 #include "wx/splitter.h"
 #include <fstream>
 #include <sstream>
+#include <map>
 #include "animations.h"
 
 #if wxUSE_ZLIB
@@ -85,18 +86,20 @@ public:
     SimulationGLCanvas* GetCanvas() { return m_canvas; }
 
     ~MyFrame();
-private:    
+private:
+    map<string, wxControl*> m_controls; //Control pointers that are passed to the animation scenes.
     wxButton* m_btn1 = nullptr;
     wxTextCtrl *m_txt1 = nullptr;
     wxListBox *m_list1 = nullptr;
     wxListCtrl *m_list = nullptr;
     wxPanel *m_panel = nullptr;
     wxRichTextCtrl *m_richTextCtrl = nullptr; 
-
+    wxStaticText* m_txt;
 
     wxSizer* m_wrapsizer;
-    wxSizer* m_framesizer;
-
+    wxSizer* m_flexSizer;
+    wxSizer* m_framesizer; 
+    weak_ptr<AnimationSceneBase> m_animationScene;
     void OnButtonClicked(wxCommandEvent& evt);
     void OnSelectSubject(wxListEvent& event);
 
@@ -124,7 +127,12 @@ public:
     void LoadDXF(const wxString& filename);
     void LoadShaders(const char* vertexFile,const char* fragmentFile);
     void Replay() { m_animationScene->Replay(); }
-    void LoadScene(int sceneNumber);
+    void LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>& scene);
+    void SetPanelControls(map<string, wxControl*>& m_controls)
+    { 
+        m_animationScene->SetPanelControls(m_controls); 
+        //((wxStaticText*)m_controls["text"])->SetLabel("In Canvas");
+    }
 protected:
     void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
@@ -147,7 +155,7 @@ private:
     GLData       m_gldata;
     DXFRenderer  m_renderer; 
     //AnimationSceneBase* m_animationScene;
-    unique_ptr<AnimationSceneBase> m_animationScene;
+    shared_ptr<AnimationSceneBase> m_animationScene;
     GLuint m_vertexbuffer=0; // This will identify our vertex buffer
     LARGE_INTEGER m_frequency, m_startTime, m_endTime, m_elapsedTime;
     GLuint m_texture1=0, m_texture2=0;

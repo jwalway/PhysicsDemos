@@ -142,16 +142,25 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
 
     //m_buttonOne->Bind(wxEVT_BUTTON, &MainFrameFunctions::buttonOneClicked, this);
     
-    m_wrapsizer = new wxWrapSizer(wxHORIZONTAL);  
+    //m_wrapsizer = new wxWrapSizer(wxHORIZONTAL);
+    m_flexSizer = new wxFlexGridSizer(4);
 
     m_btn1 = new wxButton(m_panel, 10001, "Run Again", wxDefaultPosition, wxDefaultSize); 
     m_txt1 = new wxTextCtrl(m_panel, 10002, "Text Goes Here", wxDefaultPosition, wxDefaultSize);
 
     m_btn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
-    m_wrapsizer->Add(m_btn1);
-    m_wrapsizer->Add(m_txt1);
+    //m_wrapsizer->Add(m_btn1);
+    //m_wrapsizer->Add(m_txt1);
+    m_flexSizer->Add(m_btn1);
+    m_flexSizer->Add(m_txt1);
+    m_flexSizer->Add(new wxButton(m_panel, 10003, "Extra Button", wxDefaultPosition, wxDefaultSize));
+    m_txt = new wxStaticText(m_panel, wxID_ANY, "Enter &Time:");
+    m_flexSizer->Add(m_txt); // new wxStaticText(m_panel, wxID_ANY, "Enter &Time:"));
+    //m_panel->SetSizer(m_wrapsizer);
+    m_panel->SetSizer(m_flexSizer);
 
-    m_panel->SetSizer(m_wrapsizer);
+    m_txt->SetLabel("New Text!");
+    m_controls["text"] = m_txt;
 
     splitter2->SplitHorizontally(m_canvas, m_panel, 400);
     splitter2->SetMinimumPaneSize(150);
@@ -253,6 +262,24 @@ void MyFrame::OnButtonClicked(wxCommandEvent& evt)
         //m_btn1->Unbind()
     }
     */
+    /*
+    if (evt.GetId() == 10001)
+    {
+        if ( m_flexSizer->GetItemCount() == 4)
+        {
+            m_flexSizer->Remove(3);
+            delete m_txt1; // = new wxTextCtrl(m_panel, 10002, "Text Goes Here", wxDefaultPosition, wxDefaultSize);
+        }
+        else {
+            m_txt1 = new wxTextCtrl(m_panel, 10002, "Text Goes Here", wxDefaultPosition, wxDefaultSize);
+            m_flexSizer->Add(m_txt1);
+        }
+        m_panel->InvalidateBestSize();
+        m_panel->Layout();
+        //m_btn1->Unbind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
+        //m_btn1->Unbind()
+    }
+    */
     evt.Skip(); // Tells the system that the event has been handled.
 }
 
@@ -260,7 +287,8 @@ void MyFrame::OnButtonClicked(wxCommandEvent& evt)
 void MyFrame::OnSelectSubject(wxListEvent& event)
 {    
     int index = event.m_itemIndex;
-    m_canvas->LoadScene(index);     
+    m_canvas->LoadScene(index,m_animationScene);
+    m_canvas->SetPanelControls(m_controls);
 }
 
 // File|Open... command
@@ -328,7 +356,7 @@ SimulationGLCanvas::SimulationGLCanvas(wxWindow* parent,
     QueryPerformanceCounter(&m_startTime); //Initialize counter
 }
 
-void SimulationGLCanvas::LoadScene(int sceneNumber)
+void SimulationGLCanvas::LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>& scene)
 {
     //Note: I'm also going to have to take care of changing the front panels... 1/25/20, 8:42 p.m.
     //The front panel could be changed in void MyFrame::OnSelectSubject(wxListEvent& event) after
@@ -338,9 +366,10 @@ void SimulationGLCanvas::LoadScene(int sceneNumber)
     
     if (sceneNumber == 0) {
         //SplashScene
-        m_animationScene = make_unique<SplashScene>();
+        m_animationScene = make_shared<SplashScene>();
         m_animationScene->LoadObjects("..\\resources\\SplashScene\\animation1.data");
         m_animationScene->Initialize();
+        scene = m_animationScene;
         m_currentScene = sceneNumber;
     }
     else if (sceneNumber == 1) {
@@ -348,9 +377,10 @@ void SimulationGLCanvas::LoadScene(int sceneNumber)
         //m_animationScene = make_unique<SplashScene>();
         //m_animationScene->LoadObjects("..\\resources\\SplashScene\\animationTest.data");
         //m_animationScene->Initialize();
-        m_animationScene = make_unique<CollisionScene>();
+        m_animationScene = make_shared<CollisionScene>();
         m_animationScene->LoadObjects("..\\resources\\CollisionScene\\collision.data");
         m_animationScene->Initialize();
+        scene = m_animationScene;
         m_currentScene = sceneNumber;
        // m_animationScene = new CollisionScene();
     }
