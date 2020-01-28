@@ -144,7 +144,7 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     
     //m_wrapsizer = new wxWrapSizer(wxHORIZONTAL);
     m_flexSizer = new wxFlexGridSizer(4);
-
+    /*
     m_btn1 = new wxButton(m_panel, 10001, "Run Again", wxDefaultPosition, wxDefaultSize); 
     m_txt1 = new wxTextCtrl(m_panel, 10002, "Text Goes Here", wxDefaultPosition, wxDefaultSize);
 
@@ -161,7 +161,8 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
 
     m_txt->SetLabel("New Text!");
     m_controls["text"] = m_txt;
-
+    */
+    m_panel->SetSizer(m_flexSizer);
     splitter2->SplitHorizontally(m_canvas, m_panel, 400);
     splitter2->SetMinimumPaneSize(150);
     splitter3->SplitHorizontally(m_list, m_richTextCtrl, 400);
@@ -176,6 +177,16 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     wxImage::AddHandler(new wxJPEGHandler);
     wxImage::AddHandler(new wxGIFHandler);
     WriteInitialText();
+    m_canvas->CreateInitialScene(m_animationScene);
+    SplashPanel();
+    //map<string, wxControl*> *tmp;
+
+    //tmp = &m_controls;
+    //(*tmp)["h"] = m_richTextCtrl;
+    int ii = 0;
+    ii++;
+    //tmp->["hey"] = m_richTextCtrl;
+    //*(tmp)["hey"] = m_richTextCtrl;
      //glGetIntegerv(GL_MAJOR_VERSION, &maj);
      //glGetIntegerv(GL_MINOR_VERSION, &min);
     //AnimationScene animate;
@@ -283,11 +294,87 @@ void MyFrame::OnButtonClicked(wxCommandEvent& evt)
     evt.Skip(); // Tells the system that the event has been handled.
 }
 
+void MyFrame::OnButton2Clicked(wxCommandEvent& evt)
+{
+
+    evt.Skip();
+}
+
 // Item selected from ListBoxCtrl
 void MyFrame::OnSelectSubject(wxListEvent& event)
 {    
     int index = event.m_itemIndex;
-    m_canvas->LoadScene(index,m_animationScene);
+    if (m_canvas->LoadScene(index, m_animationScene) == false)
+        return;
+    switch (index) {
+    case 0:
+        SplashPanel();
+        break;
+    case 1:
+        CollisionPanel();
+        break;
+    }
+}
+
+void MyFrame::SplashPanel()
+{
+    //Don't forget to unbind controls
+    while (m_flexSizer->GetItemCount() > 1)
+    {
+        m_flexSizer->Remove(1);
+    }
+    map<string, wxControl*>::iterator p;
+    for (p = m_controls.begin(); p != m_controls.end(); p++)
+    {
+        if (p->second != nullptr) {
+            delete p->second;
+        }
+    }   
+
+    m_controls.clear();
+    wxButton *butn1 = new wxButton(m_panel, 10001, "Run", wxDefaultPosition, wxDefaultSize);
+    m_controls["run_button"] = butn1;
+    butn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
+    wxTextCtrl *txt1 = new wxTextCtrl(m_panel, 10002, "Text Goes Here", wxDefaultPosition, wxDefaultSize);
+    m_controls["text"] = txt1;
+    butn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);    
+    m_flexSizer->Add(butn1);
+    m_flexSizer->Add(txt1);    
+    m_panel->InvalidateBestSize();
+    m_panel->Layout();
+    m_canvas->SetPanelControls(m_controls);
+}
+
+void MyFrame::CollisionPanel()
+{
+    //Don't forget to unbind controls
+    while (m_flexSizer->GetItemCount() > 1)
+    {
+        m_flexSizer->Remove(1);
+    }
+    map<string, wxControl*>::iterator p;
+    for (p = m_controls.begin(); p != m_controls.end(); p++)
+    {
+        if (p->second != nullptr) {
+            delete p->second;
+        }
+    }
+    m_controls.clear();
+    wxButton* butn1 = new wxButton(m_panel, 10001, "Run", wxDefaultPosition, wxDefaultSize);
+    m_controls["run_button"] = butn1;
+    butn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
+    m_flexSizer->Add(butn1);
+    wxTextCtrl* txt1 = new wxTextCtrl(m_panel, 10002, "Collisions", wxDefaultPosition, wxDefaultSize);
+    m_controls["text1"] = txt1;
+    m_flexSizer->Add(txt1);
+    butn1 = new wxButton(m_panel, 10003, "Don't Run", wxDefaultPosition, wxDefaultSize);
+    m_controls["dont_button"] = butn1;
+    m_flexSizer->Add(butn1);
+    txt1 = new wxTextCtrl(m_panel, 10002, "Stuff!", wxDefaultPosition, wxDefaultSize);
+    m_controls["text2"] = txt1;
+    m_flexSizer->Add(txt1); 
+    m_panel->InvalidateBestSize();
+    m_panel->Layout();
     m_canvas->SetPanelControls(m_controls);
 }
 
@@ -356,13 +443,13 @@ SimulationGLCanvas::SimulationGLCanvas(wxWindow* parent,
     QueryPerformanceCounter(&m_startTime); //Initialize counter
 }
 
-void SimulationGLCanvas::LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>& scene)
+bool SimulationGLCanvas::LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>& scene)
 {
     //Note: I'm also going to have to take care of changing the front panels... 1/25/20, 8:42 p.m.
     //The front panel could be changed in void MyFrame::OnSelectSubject(wxListEvent& event) after
     //returning from this function (to confirm this function was successful.
     if (m_currentScene == sceneNumber)
-        return;
+        return false;
     
     if (sceneNumber == 0) {
         //SplashScene
@@ -384,6 +471,13 @@ void SimulationGLCanvas::LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>
         m_currentScene = sceneNumber;
        // m_animationScene = new CollisionScene();
     }
+    return true;
+}
+
+
+void SimulationGLCanvas::CreateInitialScene(weak_ptr<AnimationSceneBase>& scene) {
+    m_animationScene = make_shared<SplashScene>();
+    scene = m_animationScene;
 }
 
 GLuint SimulationGLCanvas::LoadTexture(const char* imagepath)
@@ -726,7 +820,8 @@ void SimulationGLCanvas::InitGLScene()
 {
     //Somewhere I will need to have a place where a new scene is selected and instantiated 1/19/20, 10:58 p.m.
  
-    m_animationScene = make_unique<SplashScene>();
+
+    //m_animationScene = make_unique<SplashScene>();
     m_animationScene->LoadObjects("..\\resources\\SplashScene\\animation1.data");
     //m_animationScene->LoadObjects("..\\resources\\SplashScene\\animationTest.data");
     m_animationScene->Initialize(); 

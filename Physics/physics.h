@@ -101,11 +101,14 @@ private:
     wxSizer* m_framesizer; 
     weak_ptr<AnimationSceneBase> m_animationScene;
     void OnButtonClicked(wxCommandEvent& evt);
+    void OnButton2Clicked(wxCommandEvent& evt);
     void OnSelectSubject(wxListEvent& event);
 
     void PopulateListBox();
 
     void WriteInitialText();
+    void SplashPanel();
+    void CollisionPanel();
     
 private:
     SimulationGLCanvas* m_canvas;
@@ -127,12 +130,14 @@ public:
     void LoadDXF(const wxString& filename);
     void LoadShaders(const char* vertexFile,const char* fragmentFile);
     void Replay() { m_animationScene->Replay(); }
-    void LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>& scene);
+    bool LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>& scene);
     void SetPanelControls(map<string, wxControl*>& m_controls)
     { 
         m_animationScene->SetPanelControls(m_controls); 
         //((wxStaticText*)m_controls["text"])->SetLabel("In Canvas");
     }
+
+    void CreateInitialScene(weak_ptr<AnimationSceneBase>& scene);
 protected:
     void OnPaint(wxPaintEvent& event);
     void OnSize(wxSizeEvent& event);
