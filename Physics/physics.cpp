@@ -332,6 +332,11 @@ void MyFrame::SplashPanel()
     }   
 
     m_controls.clear();
+    
+    //Create a sizer for this panel
+    wxFlexGridSizer *flexSizer = new wxFlexGridSizer(2);
+    m_panel->SetSizer(flexSizer);
+    m_flexSizer = flexSizer;
     wxButton *butn1 = new wxButton(m_panel, 10001, "Run", wxDefaultPosition, wxDefaultSize);
     m_controls["run_button"] = butn1;
     butn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
@@ -360,19 +365,53 @@ void MyFrame::CollisionPanel()
         }
     }
     m_controls.clear();
-    wxButton* butn1 = new wxButton(m_panel, 10001, "Run", wxDefaultPosition, wxDefaultSize);
+    int idx = 10001;
+    //Create a sizer for this panel
+    wxFlexGridSizer* flexSizer = new wxFlexGridSizer(4);
+    m_panel->SetSizer(flexSizer);
+    m_flexSizer = flexSizer;
+
+    //First Line
+    wxButton* butn1 = new wxButton(m_panel, idx++, "Run", wxDefaultPosition, wxDefaultSize);
     m_controls["run_button"] = butn1;
     butn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
     m_flexSizer->Add(butn1);
-    wxTextCtrl* txt1 = new wxTextCtrl(m_panel, 10002, "Collisions", wxDefaultPosition, wxDefaultSize);
-    m_controls["text1"] = txt1;
+    wxStaticText *stxt = new wxStaticText(m_panel, idx++, "Before Collision:");
+    m_flexSizer->Add(stxt);
+    stxt = new wxStaticText(m_panel, idx++, " ----- ");
+    m_flexSizer->Add(stxt);
+    stxt = new wxStaticText(m_panel, idx++, " ----- ");
+    flexSizer->Add(stxt);
+
+    //stxt = new wxStaticText(m_panel, idx++, " ----- ");
+    //flexSizer->Add(stxt);
+
+    //Second Line
+    stxt = new wxStaticText(m_panel, idx++, "Mass #1 kg:");
+    m_flexSizer->Add(stxt);
+    m_controls["mass1_txt"] = stxt;
+    wxTextCtrl* txt1 = new wxTextCtrl(m_panel, 10002, "10.0", wxDefaultPosition, wxDefaultSize);  
     m_flexSizer->Add(txt1);
-    butn1 = new wxButton(m_panel, 10003, "Don't Run", wxDefaultPosition, wxDefaultSize);
-    m_controls["dont_button"] = butn1;
-    m_flexSizer->Add(butn1);
-    txt1 = new wxTextCtrl(m_panel, 10002, "Stuff!", wxDefaultPosition, wxDefaultSize);
-    m_controls["text2"] = txt1;
-    m_flexSizer->Add(txt1); 
+    m_controls["mass1"] = txt1;
+
+    stxt = new wxStaticText(m_panel, idx++, "Mass #2 kg:");
+    m_flexSizer->Add(stxt);
+    m_controls["mass1_txt"] = stxt;
+    txt1 = new wxTextCtrl(m_panel, 10002, "20.0", wxDefaultPosition, wxDefaultSize);
+    m_flexSizer->Add(txt1);
+    m_controls["mass2"] = txt1;
+
+    //Third Line
+    stxt = new wxStaticText(m_panel, idx++, "After Collision:");
+    m_flexSizer->Add(stxt);
+    stxt = new wxStaticText(m_panel, idx++, "Velocity 1 =");
+    m_flexSizer->Add(stxt);
+    m_controls["velocity1"] = stxt;
+    stxt = new wxStaticText(m_panel, idx++, "Velocity 2 =");
+    flexSizer->Add(stxt);
+    m_controls["velocity2"] = stxt;
+
+   
     m_panel->InvalidateBestSize();
     m_panel->Layout();
     m_canvas->SetPanelControls(m_controls);
