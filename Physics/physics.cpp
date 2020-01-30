@@ -130,7 +130,7 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
 
     m_list = new wxListCtrl(splitter3, (int)Splash::List, wxDefaultPosition, wxSize(200, 200),
         wxLC_REPORT | wxSUNKEN_BORDER);
-    m_list->AppendColumn(wxT("Topics:"), wxLIST_FORMAT_LEFT, 200);
+    m_list->AppendColumn(wxT("Topics:"), wxLIST_FORMAT_LEFT, 200);    
 
     m_richTextCtrl = new wxRichTextCtrl(splitter3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxVSCROLL | wxHSCROLL/*|wxWANTS_CHARS*/);
   
@@ -144,24 +144,6 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     
     //m_wrapsizer = new wxWrapSizer(wxHORIZONTAL);
     m_flexSizer = new wxFlexGridSizer(4);
-    /*
-    m_btn1 = new wxButton(m_panel, 10001, "Run Again", wxDefaultPosition, wxDefaultSize); 
-    m_txt1 = new wxTextCtrl(m_panel, 10002, "Text Goes Here", wxDefaultPosition, wxDefaultSize);
-
-    m_btn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
-    //m_wrapsizer->Add(m_btn1);
-    //m_wrapsizer->Add(m_txt1);
-    m_flexSizer->Add(m_btn1);
-    m_flexSizer->Add(m_txt1);
-    m_flexSizer->Add(new wxButton(m_panel, 10003, "Extra Button", wxDefaultPosition, wxDefaultSize));
-    m_txt = new wxStaticText(m_panel, wxID_ANY, "Enter &Time:");
-    m_flexSizer->Add(m_txt); // new wxStaticText(m_panel, wxID_ANY, "Enter &Time:"));
-    //m_panel->SetSizer(m_wrapsizer);
-    m_panel->SetSizer(m_flexSizer);
-
-    m_txt->SetLabel("New Text!");
-    m_controls["text"] = m_txt;
-    */
 
     
     m_panel->SetSizer(m_flexSizer);
@@ -180,15 +162,10 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     wxImage::AddHandler(new wxGIFHandler);
     WriteInitialText();
     m_canvas->CreateInitialScene(m_animationScene);
-    SplashPanel();
-    //map<string, wxControl*> *tmp;
 
-    //tmp = &m_controls;
-    //(*tmp)["h"] = m_richTextCtrl;
-    int ii = 0;
-    ii++;
-    //tmp->["hey"] = m_richTextCtrl;
-    //*(tmp)["hey"] = m_richTextCtrl;
+    m_list->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    SplashPanel();
+
      //glGetIntegerv(GL_MAJOR_VERSION, &maj);
      //glGetIntegerv(GL_MINOR_VERSION, &min);
     //AnimationScene animate;
@@ -209,6 +186,48 @@ void MyFrame::PopulateListBox()
         m_list->InsertItem(i, topics[i].c_str());
 }
 
+void MyFrame::WriteInitialText()
+{
+    wxRichTextCtrl& r = *m_richTextCtrl;
+
+    //r.SetDefaultStyle();
+    r.Freeze();
+    r.BeginSuppressUndo();
+    r.BeginParagraphSpacing(0, 20);
+    r.BeginAlignment(wxTEXT_ALIGNMENT_CENTER);
+    r.BeginBold();
+    r.BeginFontSize(14);
+
+    wxString lineBreak = (wxChar)29;
+
+    r.WriteText(wxString(wxT("Physics Simulations")));
+    r.EndFontSize();    
+
+    r.EndBold();
+
+    r.Newline();
+
+    r.BeginFontSize(12);
+    r.WriteText(wxT("Learn Physics Concepts and See Them Simulated.\n"));
+
+    r.BeginItalic();
+    r.WriteText(wxT("by John Alway"));
+    r.EndItalic();
+    r.EndFontSize();
+    r.Newline();
+    r.WriteImage(wxBitmap(zebra_xpm));
+
+    r.Newline();
+    r.Newline();
+
+    r.EndAlignment();
+    r.EndParagraphSpacing();
+    r.EndSuppressUndo();
+    r.Thaw();
+
+}
+
+/*
 void MyFrame::WriteInitialText()
 {
     wxRichTextCtrl& r = *m_richTextCtrl;
@@ -244,7 +263,7 @@ void MyFrame::WriteInitialText()
     r.Thaw();
 
 }
-
+*/
 
 MyFrame::~MyFrame()
 {
@@ -321,10 +340,11 @@ void MyFrame::OnSelectSubject(wxListEvent& event)
 void MyFrame::SplashPanel()
 {
     //Don't forget to unbind controls
-    while (m_flexSizer->GetItemCount() > 1)
+    while (m_flexSizer->GetItemCount()) //m_flexSizer->IsEmpty() == false)
     {
-        m_flexSizer->Remove(1);
+        m_flexSizer->Remove(0);
     }
+    //Delete controls from previous panel
     map<string, wxControl*>::iterator p;
     for (p = m_controls.begin(); p != m_controls.end(); p++)
     {
@@ -337,7 +357,7 @@ void MyFrame::SplashPanel()
     
     //Create a sizer for this panel
     wxFlexGridSizer *flexSizer = new wxFlexGridSizer(2,5,5);
-    m_panel->SetSizer(flexSizer);
+    m_panel->SetSizer(flexSizer);   
     m_flexSizer = flexSizer;
     wxButton *butn1 = new wxButton(m_panel, 10001, "Run", wxDefaultPosition, wxDefaultSize);
     m_controls["run_button"] = butn1;
@@ -348,17 +368,19 @@ void MyFrame::SplashPanel()
     m_flexSizer->Add(butn1); // , 0, 0, 5);
     m_flexSizer->Add(txt1);    
     m_panel->InvalidateBestSize();
-    m_panel->Layout();
+    m_panel->Layout();  
     m_canvas->SetPanelControls(m_controls);
+
 }
 
 void MyFrame::CollisionPanel()
 {
     //Don't forget to unbind controls
-    while (m_flexSizer->GetItemCount() > 1)
+    while (m_flexSizer->GetItemCount())
     {
-        m_flexSizer->Remove(1);
+        m_flexSizer->Remove(0);
     }
+    //Delete controls from previous panel
     map<string, wxControl*>::iterator p;
     for (p = m_controls.begin(); p != m_controls.end(); p++)
     {
@@ -379,17 +401,20 @@ void MyFrame::CollisionPanel()
     butn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);
     m_flexSizer->Add(butn1);
     wxStaticText *stxt = new wxStaticText(m_panel, idx++, "Before Collision:");
+    m_controls["spc1"] = stxt;
     m_flexSizer->Add(stxt);
     stxt = new wxStaticText(m_panel, idx++, " ----- ");
+    m_controls["spc2"] = stxt;
     m_flexSizer->Add(stxt);
     stxt = new wxStaticText(m_panel, idx++, " ----- ");
+    m_controls["spc3"] = stxt;
     flexSizer->Add(stxt);
-
     stxt = new wxStaticText(m_panel, idx++, " ----- ");
+    m_controls["spc4"] = stxt;
     flexSizer->Add(stxt);
 
     //Second Line
-    stxt = new wxStaticText(m_panel, idx++, "Mass #1 kg:");
+    stxt = new wxStaticText(m_panel, idx++, "Mass #1 kg:");    
     m_flexSizer->Add(stxt);
     m_controls["mass1_txt"] = stxt;
     wxTextCtrl* txt1 = new wxTextCtrl(m_panel, idx++, "10.0", wxDefaultPosition, wxDefaultSize);  
@@ -414,13 +439,13 @@ void MyFrame::CollisionPanel()
     //Third Line
     stxt = new wxStaticText(m_panel, idx++, "Mass #2 kg:");
     m_flexSizer->Add(stxt);
-    m_controls["mass1_txt"] = stxt;
+    m_controls["mass2_txt"] = stxt;
     txt1 = new wxTextCtrl(m_panel, 10002, "25.0", wxDefaultPosition, wxDefaultSize);
     m_flexSizer->Add(txt1);
     m_controls["mass2"] = txt1;
     stxt = new wxStaticText(m_panel, idx++, "Velocity #2 m/s:");
     m_flexSizer->Add(stxt);
-    m_controls["velocity1_txt"] = stxt;
+    m_controls["velocity2_txt"] = stxt;
     txt1 = new wxTextCtrl(m_panel, 10002, "15.0", wxDefaultPosition, wxDefaultSize);
     m_flexSizer->Add(txt1);
     m_controls["in_velocity2"] = txt1;
@@ -434,6 +459,7 @@ void MyFrame::CollisionPanel()
     //Fourth Line
     stxt = new wxStaticText(m_panel, idx++, "After Collision:");
     m_flexSizer->Add(stxt);
+    m_controls["spc5"] = stxt;
     stxt = new wxStaticText(m_panel, idx++, "Velocity 1?");
     m_flexSizer->Add(stxt);
     m_controls["out_velocity1"] = stxt;
