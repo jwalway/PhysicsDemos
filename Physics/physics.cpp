@@ -162,6 +162,8 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     m_txt->SetLabel("New Text!");
     m_controls["text"] = m_txt;
     */
+
+    
     m_panel->SetSizer(m_flexSizer);
     splitter2->SplitHorizontally(m_canvas, m_panel, 400);
     splitter2->SetMinimumPaneSize(150);
@@ -334,7 +336,7 @@ void MyFrame::SplashPanel()
     m_controls.clear();
     
     //Create a sizer for this panel
-    wxFlexGridSizer *flexSizer = new wxFlexGridSizer(2);
+    wxFlexGridSizer *flexSizer = new wxFlexGridSizer(2,5,5);
     m_panel->SetSizer(flexSizer);
     m_flexSizer = flexSizer;
     wxButton *butn1 = new wxButton(m_panel, 10001, "Run", wxDefaultPosition, wxDefaultSize);
@@ -343,7 +345,7 @@ void MyFrame::SplashPanel()
     wxTextCtrl *txt1 = new wxTextCtrl(m_panel, 10002, "Text Goes Here", wxDefaultPosition, wxDefaultSize);
     m_controls["text"] = txt1;
     butn1->Bind(wxEVT_BUTTON, &MyFrame::OnButtonClicked, this);    
-    m_flexSizer->Add(butn1);
+    m_flexSizer->Add(butn1); // , 0, 0, 5);
     m_flexSizer->Add(txt1);    
     m_panel->InvalidateBestSize();
     m_panel->Layout();
@@ -367,7 +369,7 @@ void MyFrame::CollisionPanel()
     m_controls.clear();
     int idx = 10001;
     //Create a sizer for this panel
-    wxFlexGridSizer* flexSizer = new wxFlexGridSizer(4);
+    wxFlexGridSizer* flexSizer = new wxFlexGridSizer(5,5,5);
     m_panel->SetSizer(flexSizer);
     m_flexSizer = flexSizer;
 
@@ -383,33 +385,61 @@ void MyFrame::CollisionPanel()
     stxt = new wxStaticText(m_panel, idx++, " ----- ");
     flexSizer->Add(stxt);
 
-    //stxt = new wxStaticText(m_panel, idx++, " ----- ");
-    //flexSizer->Add(stxt);
+    stxt = new wxStaticText(m_panel, idx++, " ----- ");
+    flexSizer->Add(stxt);
 
     //Second Line
     stxt = new wxStaticText(m_panel, idx++, "Mass #1 kg:");
     m_flexSizer->Add(stxt);
     m_controls["mass1_txt"] = stxt;
-    wxTextCtrl* txt1 = new wxTextCtrl(m_panel, 10002, "10.0", wxDefaultPosition, wxDefaultSize);  
+    wxTextCtrl* txt1 = new wxTextCtrl(m_panel, idx++, "10.0", wxDefaultPosition, wxDefaultSize);  
     m_flexSizer->Add(txt1);
     m_controls["mass1"] = txt1;
-
+    stxt = new wxStaticText(m_panel, idx++, "Velocity #1 m/s:");
+    m_flexSizer->Add(stxt);
+    m_controls["velocity1_txt"] = stxt;
+    txt1 = new wxTextCtrl(m_panel, idx++, "20.0", wxDefaultPosition, wxDefaultSize);
+    m_flexSizer->Add(txt1);
+    m_controls["in_velocity1"] = txt1;
+    
+    wxChoice* choice = new wxChoice(m_panel, idx++); // , wxDefaultPosition, wxDefaultSize, ;
+    choice->Append("Elastic");
+    choice->Append("0.7");
+    choice->Append("0.5");
+    choice->Append("0.2");
+    choice->Append("Inelastic");
+    choice->SetSelection(0);
+    m_flexSizer->Add(choice);
+    m_controls["restitution"] = choice;
+    //Third Line
     stxt = new wxStaticText(m_panel, idx++, "Mass #2 kg:");
     m_flexSizer->Add(stxt);
     m_controls["mass1_txt"] = stxt;
-    txt1 = new wxTextCtrl(m_panel, 10002, "20.0", wxDefaultPosition, wxDefaultSize);
+    txt1 = new wxTextCtrl(m_panel, 10002, "25.0", wxDefaultPosition, wxDefaultSize);
     m_flexSizer->Add(txt1);
     m_controls["mass2"] = txt1;
+    stxt = new wxStaticText(m_panel, idx++, "Velocity #2 m/s:");
+    m_flexSizer->Add(stxt);
+    m_controls["velocity1_txt"] = stxt;
+    txt1 = new wxTextCtrl(m_panel, 10002, "15.0", wxDefaultPosition, wxDefaultSize);
+    m_flexSizer->Add(txt1);
+    m_controls["in_velocity2"] = txt1;
+    choice = new wxChoice(m_panel, idx++);
+    choice->Append("Metric Units");
+    choice->Append("English Units");
+    choice->SetSelection(0);
+    m_flexSizer->Add(choice);
+    m_controls["units"] = choice;
 
-    //Third Line
+    //Fourth Line
     stxt = new wxStaticText(m_panel, idx++, "After Collision:");
     m_flexSizer->Add(stxt);
-    stxt = new wxStaticText(m_panel, idx++, "Velocity 1 =");
+    stxt = new wxStaticText(m_panel, idx++, "Velocity 1?");
     m_flexSizer->Add(stxt);
-    m_controls["velocity1"] = stxt;
-    stxt = new wxStaticText(m_panel, idx++, "Velocity 2 =");
+    m_controls["out_velocity1"] = stxt;
+    stxt = new wxStaticText(m_panel, idx++, "Velocity 2?");
     flexSizer->Add(stxt);
-    m_controls["velocity2"] = stxt;
+    m_controls["out_velocity2"] = stxt;
 
    
     m_panel->InvalidateBestSize();

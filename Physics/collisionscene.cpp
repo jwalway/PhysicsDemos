@@ -100,6 +100,43 @@ void CollisionScene::Draw(float deltaTime)
     m_backgroundObject->Draw(deltaTime, m_shaderProgram);
 }
 
+void CollisionScene::Replay()
+{
+    wxString m1, m2, v1, v2, elasticity, units, vo1, vo2;
+    int i = 0;
+    i++;
+    wxTextCtrl* txt;
+    txt = (wxTextCtrl*)((*m_controls)["mass1"]);
+    m1 = txt->GetLabelText();
+    txt = (wxTextCtrl*)((*m_controls)["mass2"]);
+    m2 = txt->GetLabelText();
+    txt = (wxTextCtrl*)((*m_controls)["in_velocity1"]);
+    v1 = txt->GetLabelText();
+    txt = (wxTextCtrl*)((*m_controls)["in_velocity2"]);
+    v2 = txt->GetLabelText();
+
+    wxChoice* choice;
+    choice = (wxChoice*)((*m_controls)["restitution"]);    
+    elasticity = choice->GetString(choice->GetSelection());
+
+    choice = (wxChoice*)((*m_controls)["units"]);
+    units = choice->GetString(choice->GetSelection());
+    i = 4;
+
+    /* stxt = new wxStaticText(m_panel, idx++, "Velocity 1?");
+    m_flexSizer->Add(stxt);
+    m_controls["out_velocity1"] = stxt;*/
+
+    wxStaticText* stxt;
+    stxt = (wxStaticText*)((*m_controls)["out_velocity1"]);
+    stxt->SetLabelText("Velocity 1 is 35.4 m/s");
+
+    stxt = (wxStaticText*)((*m_controls)["out_velocity2"]);
+    stxt->SetLabelText("Velocity 2 is 53.4 m/s");
+
+
+}
+
 CollisionScene::~CollisionScene()
 {
     if (m_backgroundObject != nullptr)

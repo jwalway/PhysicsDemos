@@ -23,6 +23,7 @@
 #include "wx/listctrl.h"
 #include "wx/wrapsizer.h"
 #include "wx/splitter.h"
+#include "wx/choice.h"
 #include <fstream>
 #include <sstream>
 #include <map>

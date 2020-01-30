@@ -12,7 +12,7 @@ public:
 	int LoadObjects(char* filename);
 	void Process(float deltaTime) {}
 	void Initialize();
-	void Replay() {}
+	void Replay();
 	void RunScene() {}
 	~CollisionScene();
 private:
