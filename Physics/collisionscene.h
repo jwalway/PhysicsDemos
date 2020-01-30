@@ -13,6 +13,7 @@ public:
 	void Process(float deltaTime) {}
 	void Initialize();
 	void Replay();
+	void Description(wxRichTextCtrl& r);
 	void RunScene() {}
 	~CollisionScene();
 private:

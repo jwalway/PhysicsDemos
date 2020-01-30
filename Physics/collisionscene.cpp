@@ -137,6 +137,45 @@ void CollisionScene::Replay()
 
 }
 
+void CollisionScene::Description(wxRichTextCtrl& r)
+{    
+    r.Clear();
+
+    r.Freeze();
+    r.BeginSuppressUndo();
+    r.BeginParagraphSpacing(0, 20);
+    r.BeginAlignment(wxTEXT_ALIGNMENT_CENTER);
+    r.BeginBold();
+    r.BeginFontSize(14);
+
+    wxString lineBreak = (wxChar)29;
+
+    r.WriteText(wxString(wxT("Elastic And Inelastic Collisions")));
+    r.EndFontSize();
+
+    r.EndBold();
+
+    r.Newline();
+
+    r.BeginFontSize(12);
+    r.WriteText(wxT("How do Collisions Work?\n"));
+
+    r.BeginItalic();
+    r.WriteText(wxT("Have you ever wondered?"));
+    r.EndItalic();
+    r.EndFontSize();
+    r.Newline();
+    //r.WriteImage(wxBitmap(zebra_xpm));
+
+    r.Newline();
+    r.Newline();
+
+    r.EndAlignment();
+    r.EndParagraphSpacing();
+    r.EndSuppressUndo();
+    r.Thaw();
+}
+
 CollisionScene::~CollisionScene()
 {
     if (m_backgroundObject != nullptr)

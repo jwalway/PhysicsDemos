@@ -160,12 +160,14 @@ MyFrame::MyFrame(wxFrame* frame, const wxString& title, const wxPoint& pos,
     wxImage::AddHandler(new wxPNGHandler);
     wxImage::AddHandler(new wxJPEGHandler);
     wxImage::AddHandler(new wxGIFHandler);
-    WriteInitialText();
+    //WriteInitialText();
     m_canvas->CreateInitialScene(m_animationScene);
 
     m_list->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     SplashPanel();
-
+    shared_ptr<AnimationSceneBase> sp;
+    sp = m_animationScene.lock();
+    sp->Description(*m_richTextCtrl);
      //glGetIntegerv(GL_MAJOR_VERSION, &maj);
      //glGetIntegerv(GL_MINOR_VERSION, &min);
     //AnimationScene animate;
@@ -324,17 +326,22 @@ void MyFrame::OnButton2Clicked(wxCommandEvent& evt)
 // Item selected from ListBoxCtrl
 void MyFrame::OnSelectSubject(wxListEvent& event)
 {    
-    int index = event.m_itemIndex;
+    int index = event.m_itemIndex;    
+
     if (m_canvas->LoadScene(index, m_animationScene) == false)
         return;
     switch (index) {
     case 0:
         SplashPanel();
+       //m_animationScene
         break;
     case 1:
         CollisionPanel();
         break;
     }
+    shared_ptr<AnimationSceneBase> sp;
+    sp = m_animationScene.lock();
+    sp->Description(*m_richTextCtrl);
 }
 
 void MyFrame::SplashPanel()
@@ -370,7 +377,6 @@ void MyFrame::SplashPanel()
     m_panel->InvalidateBestSize();
     m_panel->Layout();  
     m_canvas->SetPanelControls(m_controls);
-
 }
 
 void MyFrame::CollisionPanel()

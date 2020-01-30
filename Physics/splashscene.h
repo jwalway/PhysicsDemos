@@ -20,6 +20,7 @@ public:
 	void Process(float deltaTime);
 	void Initialize();
 	void Replay();
+	void Description(wxRichTextCtrl& r);
 	//virtual void RunScene() = 0;
 	void RunScene() {};
 	~SplashScene();

@@ -21,6 +21,7 @@
 #include <map>
 #include "wx/defs.h"
 #include "wx/app.h"
+#include "wx/richtext/richtextctrl.h"
 
 void trim(string& str, string trimchars = " \t\f\v\n\r");
 
@@ -38,6 +39,7 @@ public:
 	void SetPanelControls(map<string, wxControl*>& controls) {
 		m_controls = &controls;
 	}
+	virtual void Description(wxRichTextCtrl& r)=0;
 protected:
 	vector<ObjectBase*> m_objects;
 	unsigned int m_shaderProgram;

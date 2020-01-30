@@ -10,6 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "splashscene.h"
+#include "zebra.xpm"
 
 float positiveDelta(float x1, float x2)
 {
@@ -122,6 +123,44 @@ void SplashScene::Draw(float deltaTime)
 void SplashScene::Process(float deltaTime)
 {
 
+}
+
+void SplashScene::Description(wxRichTextCtrl& r)
+{
+    r.Clear();
+    r.Freeze();
+    r.BeginSuppressUndo();
+    r.BeginParagraphSpacing(0, 20);
+    r.BeginAlignment(wxTEXT_ALIGNMENT_CENTER);
+    r.BeginBold();
+    r.BeginFontSize(14);
+
+    wxString lineBreak = (wxChar)29;
+
+    r.WriteText(wxString(wxT("Physics Simulations")));
+    r.EndFontSize();
+
+    r.EndBold();
+
+    r.Newline();
+
+    r.BeginFontSize(12);
+    r.WriteText(wxT("Learn Physics Concepts and See Them Simulated.\n"));
+
+    r.BeginItalic();
+    r.WriteText(wxT("by John Alway"));
+    r.EndItalic();
+    r.EndFontSize();
+    r.Newline();
+    r.WriteImage(wxBitmap(zebra_xpm));
+
+    r.Newline();
+    r.Newline();
+
+    r.EndAlignment();
+    r.EndParagraphSpacing();
+    r.EndSuppressUndo();
+    r.Thaw();
 }
 
 SplashScene::~SplashScene()
