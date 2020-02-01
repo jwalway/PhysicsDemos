@@ -85,7 +85,7 @@ int CollisionScene::LoadObjects(char* filename)
     return 0;
 }
 
-void CollisionScene::Initialize()
+void CollisionScene::Initialize(int state)
 {
     m_backgroundObject->InitObject();
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)

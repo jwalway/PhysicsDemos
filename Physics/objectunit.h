@@ -29,6 +29,7 @@ public:
 	virtual void Calculate(float deltaTime) = 0;
 	virtual void Draw(float deltaTime, unsigned int shaderProgram) = 0;
 	virtual int LoadObject(deque<string>& objectData) = 0;
+	virtual void SetState(int state) = 0;
 	virtual void Replay() = 0;
 	virtual void InitObject() = 0;
 	virtual ~ObjectBase() = 0 {};	
@@ -41,6 +42,7 @@ public:
 	void Draw(float deltaTime, unsigned int shaderProgram);
 	int LoadObject(deque<string>& objectData);
 	GLuint LoadTexture(const char* imagepath);
+	void SetState(int state) {};
 	void Replay() {};
 	void InitObject();
 	~BackgroundObject();
@@ -73,6 +75,7 @@ public:
 	void Draw(float deltaTime, unsigned int shaderProgram);
 	void Calculate(float deltaTime);
 	void Replay();
+	void SetState(int state);
 	glm::vec3 getVelocity() { return m_velocity; }
 	glm::vec3 getPosition() { return m_position; }
 	glm::vec3 getGravityWell() { return m_gravityWell; }

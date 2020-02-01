@@ -556,7 +556,7 @@ bool SimulationGLCanvas::LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>
         //SplashScene
         m_animationScene = make_shared<SplashScene>();
         m_animationScene->LoadObjects("..\\resources\\SplashScene\\animation1.data");
-        m_animationScene->Initialize();
+        m_animationScene->Initialize(1);
         scene = m_animationScene;
         m_currentScene = sceneNumber;
     }

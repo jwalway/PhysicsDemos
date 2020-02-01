@@ -32,7 +32,7 @@ public:
 	virtual void Draw(float deltaTime) = 0;
 	virtual void Process(float deltaTime) = 0;
 	void LoadShaders(const char* vertexFile, const char* fragmentFile);
-	virtual void Initialize()=0;
+	virtual void Initialize(int state=0)=0;
 	virtual void Replay() = 0;
 	virtual ~AnimationSceneBase() = 0;	
 	void UseShaderProgram() { glUseProgram(m_shaderProgram); }

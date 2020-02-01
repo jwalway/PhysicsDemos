@@ -75,7 +75,7 @@ void ObjectUnit::Calculate(float deltaTime)
     if (len > 0.04f) {
         inflate = false;
         //if (len < 0.05f)
-            len = 0.05f;
+         //   len = 0.05f;
         Force = GMM / (len * len); //(F = G m1 * m2 / r ^ 2)
         vf = glm::normalize(vf);
         //The resultant delta velocity of the ball due to the gravity force:
@@ -149,8 +149,8 @@ void ObjectUnit::Calculate(float deltaTime)
     }
     else {
         trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
-    }
-    
+    }    
+  
     m_trans = trans;
 }
 
@@ -180,10 +180,16 @@ void RandomVec(glm::vec3& v,float startRange=-1.0f,float endRange=1.0f)
     }
 
     float scale = (endRange - startRange) / (float)RAND_MAX;
+    
 
-    v.x = scale * (float)rand();
-    v.y = scale * (float)rand();
+    v.x = scale * (float)rand() - 1.0f;
+    v.y = scale * (float)rand() - 1.0f;
     v.z = 0.0f;
+    if (v.x < 0.0f)
+    {
+        int i = 0;
+        i++;
+    }
 }
 
 int ObjectUnit::LoadObject(deque<string> &objectData)
@@ -266,7 +272,7 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             {
                 m_position[idx++] = value;
             }
-            RandomVec(m_position);
+           // RandomVec(m_position);
             m_initPosition = m_position;
             objectData.pop_front(); // assume "</position>" exists and move to next element
         }      
@@ -281,7 +287,7 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             {
                 m_velocity[idx++] = value;
             }           
-            RandomVec(m_velocity);
+            //RandomVec(m_velocity);
             m_initVelocity = m_velocity;
             objectData.pop_front(); // assume "</velocity>" exists and move to next element
         }
@@ -312,6 +318,19 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             objectData.pop_front(); 
         }
     }
+
+    //Calculate velocity
+    
+   // m_position.x = -1.2f;
+    /* m_velocity = m_gravityWell - m_position;
+
+    m_velocity.x += 0.35f;
+    m_velocity.y += -0.35f;
+    m_velocity = glm::normalize(m_velocity);
+    m_velocity *= 0.5f;
+    
+    m_initVelocity = m_velocity;
+    */
   return 1;
 }
 
@@ -345,6 +364,14 @@ void ObjectUnit::Replay()
     m_inflateValue = 0.5f;
     m_velocity = m_initVelocity;
     m_position = m_initPosition;
+}
+
+void ObjectUnit::SetState(int state)
+{
+    if (state == 1) {
+        m_position = m_gravityWell;
+        m_inflateValue = 1.0f;
+    }
 }
 
 ObjectUnit::~ObjectUnit()

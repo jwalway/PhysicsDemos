@@ -19,13 +19,16 @@ float positiveDelta(float x1, float x2)
     return x1 - x2;
 }
 
-void SplashScene::Initialize()
+void SplashScene::Initialize(int state)
 {
     for (auto& x : m_objects)
     {
         x->InitObject();
+        if (state == 1) {
+            x->SetState(1);
+        }
     }
-
+    
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     glUseProgram(m_shaderProgram);
     glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);

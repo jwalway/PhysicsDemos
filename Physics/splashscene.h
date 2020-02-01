@@ -18,7 +18,7 @@ public:
 	int LoadObjects(char* filename);
 	void Draw(float deltaTime);
 	void Process(float deltaTime);
-	void Initialize();
+	void Initialize(int state);
 	void Replay();
 	void Description(wxRichTextCtrl& r);
 	//virtual void RunScene() = 0;
