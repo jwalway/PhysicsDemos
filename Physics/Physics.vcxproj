@@ -155,6 +155,7 @@
     <ClInclude Include="collisionscene.h" />
     <ClInclude Include="dxfrenderer.h" />
     <ClInclude Include="objectunit.h" />
+    <ClInclude Include="particlesystem.h" />
     <ClInclude Include="physics.h" />
     <ClInclude Include="splashscene.h" />
     <ClInclude Include="stb_image.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="collisionscene.cpp" />
     <ClCompile Include="dxfrenderer.cpp" />
     <ClCompile Include="objectunit.cpp" />
+    <ClCompile Include="particlesystem.cpp" />
     <ClCompile Include="physics.cpp" />
     <ClCompile Include="splashscene.cpp" />
     <ClCompile Include="trackball.c" />

@@ -40,7 +40,17 @@ public:
 		m_controls = &controls;
 	}
 	virtual void Description(wxRichTextCtrl& r)=0;
+	void SetCanvasSize(int w,int h) 
+	{
+		m_width = w;
+		m_height = h;
+		for (auto o : m_objects)
+		{
+			o->SetCanvasSize(w, h);
+		}
+	}
 protected:
+	int m_width, m_height;
 	vector<ObjectBase*> m_objects;
 	unsigned int m_shaderProgram;
 	unsigned int CompileShader(const char* filename, unsigned int shaderType);

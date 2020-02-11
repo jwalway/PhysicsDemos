@@ -137,19 +137,29 @@ void ObjectUnit::Calculate(float deltaTime)
     // deg += 0.3f;
     if (deg >= 360.0f)
         deg = 0.0f;
+    int w = 546, h = 396;
+    trans = glm::ortho(0.0f, static_cast<GLfloat>(w), static_cast<GLfloat>(h), 0.0f, -1.0f, 1.0f);
+    trans[1].y *= -1.0f;
+    trans[3].x = 0.0f;
+    trans[3].y = 0.0f;
+    float dval = 100.0f;
     //trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
-    trans = glm::translate(trans, glm::vec3(m_position.x, m_position.y, m_position.z));
+    trans = glm::translate(trans, glm::vec3(m_position.x*(w/2), m_position.y*(h/2), m_position.z));
     trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
-    
+    //m_trans = trans;
+   // m_trans = glm::scale(trans, glm::vec3(25.0f, 25.0f, 1.0));
     if (inflate) {
         if (m_inflateValue < 1.0f) {
             m_inflateValue += deltaTime * factor;
         }
-        trans = glm::scale(trans, glm::vec3(0.25*m_inflateValue, 0.32*m_inflateValue, 1.0));    
+        trans = glm::scale(trans, glm::vec3(150.0*m_inflateValue-50.0, 150.0*m_inflateValue-50.0, 1.0));
+        //trans = glm::scale(trans, glm::vec3(0.25*m_inflateValue, 0.32*m_inflateValue, 1.0));    
     }
     else {
-        trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
-    }    
+        trans = glm::scale(trans, glm::vec3(25.0f, 25.0f, 1.0));
+        //trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
+    } 
+    
   
     m_trans = trans;
 }

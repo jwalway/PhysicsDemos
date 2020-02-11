@@ -33,6 +33,13 @@ public:
 	virtual void Replay() = 0;
 	virtual void InitObject() = 0;
 	virtual ~ObjectBase() = 0 {};	
+	virtual void SetCanvasSize(int w, int h)
+	{
+		m_width = w;
+		m_height = h;
+	}
+protected:
+	int m_width, m_height;
 };
 
 class BackgroundObject : public ObjectBase
@@ -76,6 +83,11 @@ public:
 	void Calculate(float deltaTime);
 	void Replay();
 	void SetState(int state);
+	void SetCanvasSize(int w, int h)
+	{
+		ObjectBase::SetCanvasSize(w, h);
+	}
+
 	glm::vec3 getVelocity() { return m_velocity; }
 	glm::vec3 getPosition() { return m_position; }
 	glm::vec3 getGravityWell() { return m_gravityWell; }

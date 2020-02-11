@@ -785,8 +785,8 @@ void SimulationGLCanvas::DrawScene()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Transformations
-    glLoadIdentity();
-    glTranslatef(0.0f, 0.0f, -20.0f);
+   // glLoadIdentity();
+    //glTranslatef(0.0f, 0.0f, -20.0f);
         
     m_animationScene->Draw(m_deltaSeconds);    
     
@@ -964,7 +964,7 @@ void SimulationGLCanvas::ResetOrthoMode()
     SetCurrent(*m_glRC);
        
     GetClientSize(&w, &h);
-    
+    SetCanvasSize(w, h);
     // reset the viewport to the new dimensions, e.g. for screen resize
     glViewport(0, 0, (GLint)w, (GLint)h);
 
@@ -982,7 +982,8 @@ void SimulationGLCanvas::ResetOrthoMode()
       
     // set up an orthographic projection with the same near clip plane
     //glOrtho(-1.0, 1.0, -1.0, 1.0, 5, 100);
-    double mag = 0.02;
+    double mag = 0.02;  
+    
     glOrtho(-mag*(double)w, mag*(double)w, -mag*(double)h, mag*(double)h, 5, 100);
     //gluOrtho2D(0, w, h, 0);
 

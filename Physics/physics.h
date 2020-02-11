@@ -156,7 +156,13 @@ private:
     void DrawScene();
     unsigned int CompileShader(const char* filename, unsigned int shaderType);
     unsigned int LinkShaders(unsigned int vertex, unsigned int fragment);
-
+    void SetCanvasSize(int w, int h)
+    {
+        m_width = w;
+        m_height = h;
+        m_animationScene->SetCanvasSize(w, h);
+    }
+    int m_width, m_height;
     wxGLContext* m_glRC;
     GLData       m_gldata;
     DXFRenderer  m_renderer; 
