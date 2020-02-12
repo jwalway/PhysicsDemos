@@ -28,6 +28,10 @@ using namespace std;
 
 class ObjectBase {
 public:
+	ObjectBase(shared_ptr<ResourceManager> rm)
+	{
+		m_resources = rm;
+	}
 	virtual void Calculate(float deltaTime) = 0;
 	virtual void Draw(float deltaTime, unsigned int shaderProgram) = 0;
 	virtual int LoadObject(deque<string>& objectData) = 0;
@@ -44,21 +48,24 @@ public:
 		m_width = w;
 		m_height = h;
 	}
-	void SetResourceManager(ResourceManager& rm)
+	/*
+	void SetResourceManager(shared_ptr<ResourceManager> rm)
 	{
-		m_resources = &rm;
-	}
+		m_resources = rm;
+	}*/
 
 protected:
 	int m_width, m_height;
-	ResourceManager* m_resources;
+	//ResourceManager* m_resources;
+	shared_ptr<ResourceManager> m_resources;
 };
 
 class BackgroundObject : public ObjectBase
 {
 public:
-	BackgroundObject(ResourceManager& rm) {
-		m_resources = &rm;
+	BackgroundObject(shared_ptr<ResourceManager> rm) : ObjectBase(rm) 
+	{
+		//m_resources = rm;
 	}
 	void Calculate(float deltaTime);
 	void Draw(float deltaTime, unsigned int shaderProgram);
@@ -85,8 +92,9 @@ private:
 
 class ObjectUnit: public ObjectBase {
 public:
-	ObjectUnit(ResourceManager& rm) {
-		m_resources = &rm;
+	ObjectUnit(shared_ptr<ResourceManager> rm) : ObjectBase(rm)
+	{
+		//m_resources = rm;
 		m_particleGen.AddResourceManager(rm);
 	}
 	void InitObject();

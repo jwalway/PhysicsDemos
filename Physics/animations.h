@@ -28,13 +28,18 @@ void trim(string& str, string trimchars = " \t\f\v\n\r");
 
 class AnimationSceneBase {
 public:
+
+	AnimationSceneBase()
+	{
+		m_resources = make_shared<ResourceManager>();
+	}
 	map<string, wxControl*> *m_controls;
 	virtual int LoadObjects(char* filename) = 0;
 	virtual void Draw(float deltaTime) = 0;
 	virtual void Process(float deltaTime) = 0;
 	void LoadShaders(const char* vertexFile, const char* fragmentFile)
 	{
-		m_shaderProgram = m_resources.LoadShaders(vertexFile, fragmentFile);
+		m_shaderProgram = m_resources->LoadShaders(vertexFile, fragmentFile);
 	}
 	virtual void Initialize(int state=0)=0;
 	virtual void Replay() = 0;
@@ -58,9 +63,10 @@ protected:
 	int m_width, m_height;
 	vector<ObjectBase*> m_objects;
 	unsigned int m_shaderProgram;
-	unsigned int CompileShader(const char* filename, unsigned int shaderType);
-	unsigned int LinkShaders(unsigned int vertex, unsigned int fragment);
-	ResourceManager m_resources;
+	//unsigned int CompileShader(const char* filename, unsigned int shaderType);
+	//unsigned int LinkShaders(unsigned int vertex, unsigned int fragment);
+	//ResourceManager *m_resources;
+	shared_ptr<ResourceManager> m_resources;
 	//map<string, unsigned int> m_resources; //This holds the resource filename and path and their ids for the each animation class.
 };
 

@@ -1,3 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        Physics Demos Program
+// Purpose:     To Simulate Physics Principles
+// Author:      John Alway
+//
+// Created: 1/13/2020
+// Copyright 2020 John Alway. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE.TXT file.
+/////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "GL/glew.h"
@@ -40,9 +51,11 @@ public:
 	}
 	void SetProjection(glm::mat4& proj) { m_projection = proj; }
 	void Init();
-	void AddResourceManager(ResourceManager& rm) {
-		m_resources = &rm;
+	void AddResourceManager(shared_ptr<ResourceManager> rm) {
+		m_resources = rm;
 	}
+
+	~ParticleGenerator();
 private:
 	vector<Particle> m_particles;
 	glm::vec2 m_position;
@@ -53,6 +66,7 @@ private:
 	string m_textureFile = "";
 	glm::mat4 m_projection;
 	void RespawnParticle(Particle& particle);
-	ResourceManager *m_resources=nullptr;
+	//ResourceManager *m_resources=nullptr;
+	shared_ptr<ResourceManager> m_resources;
 };
 

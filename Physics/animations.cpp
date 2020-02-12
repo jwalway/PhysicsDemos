@@ -123,5 +123,6 @@ void AnimationSceneBase::Draw(float deltaTime)
 
 AnimationSceneBase::~AnimationSceneBase()
 {    
-    glDeleteProgram(m_shaderProgram);
+    //The program is deleted by the ResourceManager
+    //glDeleteProgram(m_shaderProgram);
 }

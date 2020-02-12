@@ -1,3 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        Physics Demos Program
+// Purpose:     To Simulate Physics Principles
+// Author:      John Alway
+//
+// Created: 1/13/2020
+// Copyright 2020 John Alway. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE.TXT file.
+/////////////////////////////////////////////////////////////////////////////
+
 #include "particlesystem.h"
 
 #include <time.h> 
@@ -6,7 +17,7 @@
 void ParticleGenerator::Init()
 {
     srand(time(NULL));
-    unsigned int VBO, VAO, EBO;
+    unsigned int VBO, VAO;
     // Set up mesh and attribute properties
     //GLuint VBO;
     GLfloat particle_quad[] = {
@@ -206,3 +217,12 @@ GLuint ParticleGenerator::LoadTexture(const char* imagepath)
     return textureID;
 }
 */
+
+ParticleGenerator::~ParticleGenerator()
+{
+    //The ResourceManager deletes the textures and shader programs
+    //unsigned int texs[2] = { m_texture, 0};
+    //glDeleteTextures(2, texs);
+    glDeleteVertexArrays(1, &m_VAO);  
+    glDeleteBuffers(1, &m_VBO);
+}

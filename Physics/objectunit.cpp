@@ -432,8 +432,9 @@ ObjectUnit::~ObjectUnit()
     if (m_indices != nullptr)
         delete m_indices;  
     int val = (int)glGetError();
-    unsigned int texs[2] = { m_texture1, m_texture2 };
-    glDeleteTextures(2, texs);
+    //ResourceManager deletes textures and shaders
+   // unsigned int texs[2] = { m_texture1, m_texture2 };
+    //glDeleteTextures(2, texs);
     val = (int)glGetError();
     glDeleteVertexArrays(1, &m_VAO);
     val = (int)glGetError();
