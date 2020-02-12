@@ -24,6 +24,10 @@ void trim(string &str, string trimchars)
 
 void AnimationSceneBase::LoadShaders(const char* vertexFile, const char* fragmentFile)
 {
+    if (m_resources.DoesResourceExist(vertexFile, fragmentFile)) {
+        m_shaderProgram = m_resources.GetResourceID(vertexFile, fragmentFile);
+        return;
+    }
     unsigned int vshader = CompileShader(vertexFile, GL_VERTEX_SHADER);
     if (!vshader) return;
     unsigned int fshader = CompileShader(fragmentFile, GL_FRAGMENT_SHADER);
@@ -31,6 +35,7 @@ void AnimationSceneBase::LoadShaders(const char* vertexFile, const char* fragmen
     unsigned int shaderProgram = LinkShaders(vshader, fshader);
     if (!shaderProgram) return;
     m_shaderProgram = shaderProgram;
+    m_resources.AddResource(vertexFile, fragmentFile, DataType::shader, m_shaderProgram);
 }
 
 unsigned int AnimationSceneBase::LinkShaders(unsigned int vertex, unsigned int fragment)
@@ -104,6 +109,7 @@ unsigned int AnimationSceneBase::CompileShader(const char* filename, unsigned in
     }
     return shaderObject;
 }
+
 /*
 void AnimationSceneBase::Draw(float deltaTime)
 {  

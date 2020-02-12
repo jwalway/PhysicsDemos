@@ -22,6 +22,7 @@
 #include "wx/defs.h"
 #include "wx/app.h"
 #include "wx/richtext/richtextctrl.h"
+#include "resources.h"
 
 void trim(string& str, string trimchars = " \t\f\v\n\r");
 
@@ -49,12 +50,15 @@ public:
 			o->SetCanvasSize(w, h);
 		}
 	}
+
 protected:
 	int m_width, m_height;
 	vector<ObjectBase*> m_objects;
 	unsigned int m_shaderProgram;
 	unsigned int CompileShader(const char* filename, unsigned int shaderType);
 	unsigned int LinkShaders(unsigned int vertex, unsigned int fragment);
+	ResourceManager m_resources;
+	//map<string, unsigned int> m_resources; //This holds the resource filename and path and their ids for the each animation class.
 };
 
 

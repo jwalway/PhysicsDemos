@@ -16,6 +16,36 @@
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+
+GLuint ObjectBase::LoadTexture(const char* imagepath)
+{
+    int width, height, nrChannels;
+
+    if (m_resources->DoesResourceExist(imagepath)) {
+        return m_resources->GetResourceID(imagepath);
+    }
+
+    unsigned char* data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
+    GLuint textureID;
+
+    glGenTextures(1, &textureID);
+
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    //stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    // Give the image to OpenGL
+    if (nrChannels == 3) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+    }
+    else {
+        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    stbi_image_free(data);
+    return textureID;
+}
 //Initializes object for rendering
 void ObjectUnit::InitObject()
 {   
@@ -344,9 +374,15 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
   return 1;
 }
 
+/*
 GLuint ObjectUnit::LoadTexture(const char* imagepath)
 {   
     int width, height, nrChannels;
+
+    if (m_resources->DoesResourceExist(imagepath)) {
+        return m_resources->GetResourceID(imagepath);
+    }
+
     unsigned char* data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
     GLuint textureID;   
 
@@ -368,6 +404,7 @@ GLuint ObjectUnit::LoadTexture(const char* imagepath)
     stbi_image_free(data);
     return textureID;
 }
+*/
 
 void ObjectUnit::Replay()
 {
@@ -491,6 +528,7 @@ int BackgroundObject::LoadObject(deque<string>& objectData)
     return 1;
 }
 
+/*
 GLuint BackgroundObject::LoadTexture(const char* imagepath)
 {
     int width, height, nrChannels;
@@ -515,6 +553,7 @@ GLuint BackgroundObject::LoadTexture(const char* imagepath)
     stbi_image_free(data);
     return textureID;
 }
+*/
 
 //Initializes object for rendering
 void BackgroundObject::InitObject()

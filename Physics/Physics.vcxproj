@@ -157,6 +157,7 @@
     <ClInclude Include="objectunit.h" />
     <ClInclude Include="particlesystem.h" />
     <ClInclude Include="physics.h" />
+    <ClInclude Include="resources.h" />
     <ClInclude Include="splashscene.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="trackball.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="objectunit.cpp" />
     <ClCompile Include="particlesystem.cpp" />
     <ClCompile Include="physics.cpp" />
+    <ClCompile Include="resources.cpp" />
     <ClCompile Include="splashscene.cpp" />
     <ClCompile Include="trackball.c" />
   </ItemGroup>

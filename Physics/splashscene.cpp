@@ -100,7 +100,7 @@ int SplashScene::LoadObjects(char* filename)
         {
             objectData.push_back(elm);
             //create object and send data to it
-            ObjectUnit* objUnit = new ObjectUnit();
+            ObjectUnit* objUnit = new ObjectUnit(m_resources);
             //ObjectBase* objBase = objUnit;
             objUnit->LoadObject(objectData);
             m_objects.push_back(objUnit);
@@ -109,6 +109,7 @@ int SplashScene::LoadObjects(char* filename)
             objectData.push_back(elm);
         }
     }
+
     LoadShaders(vertexShader.c_str(), fragmentShader.c_str());
 
     return 0;

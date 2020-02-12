@@ -70,7 +70,7 @@ int CollisionScene::LoadObjects(char* filename)
             objectData.push_back(elm);
             //create object and send data to it
             //ObjectUnit* objUnit = new ObjectUnit();
-            m_backgroundObject = new BackgroundObject();
+            m_backgroundObject = new BackgroundObject(m_resources);
             m_backgroundObject->LoadObject(objectData);
            
             //objUnit->LoadObject(objectData);
