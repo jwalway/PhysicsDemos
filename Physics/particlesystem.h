@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "stb_image.h"
-
+#include "resources.h"
 
 using namespace std;
 
@@ -26,13 +26,23 @@ public:
 
 	void Draw(float deltaTime);
 	void Update(float deltaTime);
-	GLuint LoadTexture(const char* imagepath);
+	GLuint LoadTexture(const char* imagepath)
+	{
+		m_texture = m_resources->LoadTexture(imagepath);
+	}
+	void LoadShaders(const char* vertexFile, const char* fragmentFile)
+	{
+		m_shaderProgram = m_resources->LoadShaders(vertexFile, fragmentFile);
+	}
 	void SetShader(unsigned int shader) { m_shaderProgram = shader; }
 	void SetTexture(unsigned int texture) {
 		m_texture = texture;
 	}
 	void SetProjection(glm::mat4& proj) { m_projection = proj; }
 	void Init();
+	void AddResourceManager(ResourceManager& rm) {
+		m_resources = &rm;
+	}
 private:
 	vector<Particle> m_particles;
 	glm::vec2 m_position;
@@ -43,5 +53,6 @@ private:
 	string m_textureFile = "";
 	glm::mat4 m_projection;
 	void RespawnParticle(Particle& particle);
+	ResourceManager *m_resources=nullptr;
 };
 

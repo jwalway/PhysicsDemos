@@ -31,7 +31,10 @@ public:
 	virtual void Calculate(float deltaTime) = 0;
 	virtual void Draw(float deltaTime, unsigned int shaderProgram) = 0;
 	virtual int LoadObject(deque<string>& objectData) = 0;
-	GLuint LoadTexture(const char* imagepath);
+	GLuint LoadTexture(const char* imagepath)
+	{
+		return m_resources->LoadTexture(imagepath);
+	}
 	virtual void SetState(int state) = 0;
 	virtual void Replay() = 0;
 	virtual void InitObject() = 0;
@@ -84,6 +87,7 @@ class ObjectUnit: public ObjectBase {
 public:
 	ObjectUnit(ResourceManager& rm) {
 		m_resources = &rm;
+		m_particleGen.AddResourceManager(rm);
 	}
 	void InitObject();
 	unsigned int GetShaderProgram() { return m_shaderProgram; }
@@ -120,13 +124,12 @@ private:
 	int m_indicesSize=0;
 	unsigned int m_texture1=0, m_texture2=0;
 	string m_textureFile1="", m_textureFile2="";
-	glm::vec3 m_initPosition;
-	glm::vec3 m_initVelocity;
-	glm::vec3 m_position;
-	glm::vec3 m_velocity;
-	glm::vec3 m_gravityWell;
+	glm::vec3 m_initPosition {0};
+	glm::vec3 m_initVelocity{ 0 };
+	glm::vec3 m_position{ 0 };
+	glm::vec3 m_velocity{ 0 };
+	glm::vec3 m_gravityWell{ 0 };
 	float m_inflateValue=0.5f;
 	ParticleGenerator m_particleGen;
-
 };
 

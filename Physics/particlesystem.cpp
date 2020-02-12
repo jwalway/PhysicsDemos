@@ -180,7 +180,7 @@ void ParticleGenerator::RespawnParticle(Particle& particle)
     particle.Velocity.y = glm::sin(angle) * d;
     particle.Velocity.z = 0.0f;
 }
-
+/*
 GLuint ParticleGenerator::LoadTexture(const char* imagepath)
 {
     int width, height, nrChannels;
@@ -205,3 +205,4 @@ GLuint ParticleGenerator::LoadTexture(const char* imagepath)
     stbi_image_free(data);
     return textureID;
 }
+*/

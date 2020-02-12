@@ -21,7 +21,7 @@ void trim(string &str, string trimchars)
     str.erase((end - start) + 1);    
 }
 
-
+/*
 void AnimationSceneBase::LoadShaders(const char* vertexFile, const char* fragmentFile)
 {
     if (m_resources.DoesResourceExist(vertexFile, fragmentFile)) {
@@ -109,7 +109,7 @@ unsigned int AnimationSceneBase::CompileShader(const char* filename, unsigned in
     }
     return shaderObject;
 }
-
+*/
 /*
 void AnimationSceneBase::Draw(float deltaTime)
 {  

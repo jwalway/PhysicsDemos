@@ -16,7 +16,7 @@
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-
+/*
 GLuint ObjectBase::LoadTexture(const char* imagepath)
 {
     int width, height, nrChannels;
@@ -44,8 +44,12 @@ GLuint ObjectBase::LoadTexture(const char* imagepath)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     stbi_image_free(data);
+    m_resources->AddResource(imagepath, "", DataType::texture, textureID);
     return textureID;
 }
+
+*/
+
 //Initializes object for rendering
 void ObjectUnit::InitObject()
 {   

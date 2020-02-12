@@ -32,7 +32,10 @@ public:
 	virtual int LoadObjects(char* filename) = 0;
 	virtual void Draw(float deltaTime) = 0;
 	virtual void Process(float deltaTime) = 0;
-	void LoadShaders(const char* vertexFile, const char* fragmentFile);
+	void LoadShaders(const char* vertexFile, const char* fragmentFile)
+	{
+		m_shaderProgram = m_resources.LoadShaders(vertexFile, fragmentFile);
+	}
 	virtual void Initialize(int state=0)=0;
 	virtual void Replay() = 0;
 	virtual ~AnimationSceneBase() = 0;	
