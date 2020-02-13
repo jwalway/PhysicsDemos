@@ -171,8 +171,8 @@ void ObjectUnit::Calculate(float deltaTime)
     // deg += 0.3f;
     if (deg >= 360.0f)
         deg = 0.0f;
-    int w = 546, h = 396;
-    trans = glm::ortho(0.0f, static_cast<GLfloat>(w), static_cast<GLfloat>(h), 0.0f, -1.0f, 1.0f);
+    int w = m_width, h = m_height; // 546, h = 396;
+    trans = m_projection; // glm::ortho(0.0f, static_cast<GLfloat>(w), static_cast<GLfloat>(h), 0.0f, -1.0f, 1.0f);
     trans[1].y *= -1.0f;
     trans[3].x = 0.0f;
     trans[3].y = 0.0f;
@@ -192,9 +192,7 @@ void ObjectUnit::Calculate(float deltaTime)
     else {
         trans = glm::scale(trans, glm::vec3(25.0f, 25.0f, 1.0));
         //trans = glm::scale(trans, glm::vec3(0.25 * 0.5, 0.32 * 0.5, 1.0));
-    } 
-    
-  
+    }       
     m_trans = trans;
 }
 
@@ -212,6 +210,9 @@ void ObjectUnit::Draw(float deltaTime, unsigned int shaderProgram)
 
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    m_particleGen->Update(deltaTime,m_position);
+    m_particleGen->Draw(deltaTime);
 }
 
 //v is the vector to be given a random value.  And the range of values
@@ -362,6 +363,9 @@ int ObjectUnit::LoadObject(deque<string> &objectData)
             objectData.pop_front(); 
         }
     }
+
+  
+
 
     //Calculate velocity
     

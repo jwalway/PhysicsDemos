@@ -86,7 +86,8 @@ void ParticleGenerator::Draw(float deltaTime)
             trans[3].x = 0.0f;
             trans[3].y = 0.0f;
             //trans = glm::translate(m_projection, glm::vec3(470.0/2, 427/2.0, 0.0));
-            trans = glm::translate(m_projection, glm::vec3(dx, dy, 0.0));
+            //trans = glm::translate(m_projection, glm::vec3(dx, dy, 0.0));
+            trans = glm::translate(trans, glm::vec3(m_objectPosition.x * (m_width / 2), m_objectPosition.y * (m_height / 2), m_objectPosition.z));
             dx += deltaTime * 0.1f;
             dy += deltaTime * 0.1f;
             if (dx > 460.0)
@@ -132,7 +133,7 @@ void ParticleGenerator::Draw(float deltaTime)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void ParticleGenerator::Update(float deltaTime)
+void ParticleGenerator::Update(float deltaTime, glm::vec3 objectPosition)
 {
     int i = 0;
     float d = 6.28f;
@@ -140,6 +141,7 @@ void ParticleGenerator::Update(float deltaTime)
     float angle = 0.0f;
     float green = 1.0f;
 
+    m_objectPosition = objectPosition;
     //Respawn some new particles
     int newParticles = 2;
 

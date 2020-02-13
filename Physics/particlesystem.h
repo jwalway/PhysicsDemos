@@ -36,10 +36,11 @@ class ParticleGenerator {
 public:
 
 	void Draw(float deltaTime);
-	void Update(float deltaTime);
+	void Update(float deltaTime, glm::vec3 objectPosition = { 0,0,0 });
 	GLuint LoadTexture(const char* imagepath)
 	{
 		m_texture = m_resources->LoadTexture(imagepath);
+		return m_texture;
 	}
 	void LoadShaders(const char* vertexFile, const char* fragmentFile)
 	{
@@ -50,6 +51,16 @@ public:
 		m_texture = texture;
 	}
 	void SetProjection(glm::mat4& proj) { m_projection = proj; }
+	void SetProjection(int width, int height)
+	{
+
+	}
+	void SetCanvasSize(int w, int h)
+	{
+		m_width = w;
+		m_height = h;
+		m_projection = glm::ortho(0.0f, static_cast<GLfloat>(w), static_cast<GLfloat>(h), 0.0f, -1.0f, 1.0f);
+	}
 	void Init();
 	void AddResourceManager(shared_ptr<ResourceManager> rm) {
 		m_resources = rm;
@@ -65,8 +76,10 @@ private:
 	unsigned int m_texture = 0;
 	string m_textureFile = "";
 	glm::mat4 m_projection;
+	glm::vec3  m_objectPosition { 0 };
 	void RespawnParticle(Particle& particle);
 	//ResourceManager *m_resources=nullptr;
 	shared_ptr<ResourceManager> m_resources;
+	int m_width, m_height;
 };
 

@@ -95,7 +95,11 @@ public:
 	ObjectUnit(shared_ptr<ResourceManager> rm) : ObjectBase(rm)
 	{
 		//m_resources = rm;
-		m_particleGen.AddResourceManager(rm);
+		m_particleGen = make_shared<ParticleGenerator>();
+		m_particleGen->AddResourceManager(rm);
+		m_particleGen->Init();
+		m_particleGen->LoadTexture("..\\resources\\SplashScene\\particle.png");
+		m_particleGen->LoadShaders("..\\resources\\SplashScene\\particle.vert", "..\\resources\\SplashScene\\particle.frag");
 	}
 	void InitObject();
 	unsigned int GetShaderProgram() { return m_shaderProgram; }
@@ -112,6 +116,8 @@ public:
 	void SetCanvasSize(int w, int h)
 	{
 		ObjectBase::SetCanvasSize(w, h);
+		m_particleGen->SetCanvasSize(w, h);
+		m_projection = glm::ortho(0.0f, static_cast<GLfloat>(w), static_cast<GLfloat>(h), 0.0f, -1.0f, 1.0f);
 	}
 
 	glm::vec3 getVelocity() { return m_velocity; }
@@ -138,6 +144,8 @@ private:
 	glm::vec3 m_velocity{ 0 };
 	glm::vec3 m_gravityWell{ 0 };
 	float m_inflateValue=0.5f;
-	ParticleGenerator m_particleGen;
+	//shared_ptr<ResourceManager> m_resources;
+	shared_ptr<ParticleGenerator> m_particleGen;
+	glm::mat4 m_projection;
 };
 

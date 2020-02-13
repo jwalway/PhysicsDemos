@@ -121,6 +121,7 @@ void SplashScene::Draw(float deltaTime)
     for (auto& x : m_objects)
     {
         x->Draw(deltaTime, m_shaderProgram);
+        break;
     }
 }
 
