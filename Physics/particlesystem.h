@@ -36,7 +36,7 @@ class ParticleGenerator {
 public:
 
 	void Draw(float deltaTime);
-	void Update(float deltaTime, glm::vec3 objectPosition = { 0,0,0 });
+	void Update(float deltaTime, glm::vec3 objectPosition = { 0,0,0 },  float radius=12.0f);
 	GLuint LoadTexture(const char* imagepath)
 	{
 		m_texture = m_resources->LoadTexture(imagepath);
@@ -71,7 +71,7 @@ private:
 	vector<Particle> m_particles;
 	glm::vec2 m_position;
 	unsigned int m_VBO, m_VAO, m_EBO;
-	int m_numberOfParticles = 1000;
+	int m_numberOfParticles = 500;
 	unsigned int m_shaderProgram;
 	unsigned int m_texture = 0;
 	string m_textureFile = "";
@@ -81,5 +81,6 @@ private:
 	//ResourceManager *m_resources=nullptr;
 	shared_ptr<ResourceManager> m_resources;
 	int m_width, m_height;
+	float m_radius = 12.0f;
 };
 

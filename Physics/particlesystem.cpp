@@ -16,6 +16,7 @@
 
 void ParticleGenerator::Init()
 {
+    m_numberOfParticles = 250;
     srand(time(NULL));
     unsigned int VBO, VAO;
     // Set up mesh and attribute properties
@@ -133,14 +134,15 @@ void ParticleGenerator::Draw(float deltaTime)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void ParticleGenerator::Update(float deltaTime, glm::vec3 objectPosition)
+void ParticleGenerator::Update(float deltaTime, glm::vec3 objectPosition, float radius)
 {
     int i = 0;
     float d = 6.28f;
-    static float radius = 10.0f;
+    //static float radius = 10.0f;
     float angle = 0.0f;
     float green = 1.0f;
 
+    m_radius = radius;
     m_objectPosition = objectPosition;
     //Respawn some new particles
     int newParticles = 2;
@@ -175,7 +177,7 @@ void ParticleGenerator::Update(float deltaTime, glm::vec3 objectPosition)
 void ParticleGenerator::RespawnParticle(Particle& particle)
 {
     float d = 10.0f; // 6.28f;
-    float radius = 10.0f;
+    float radius = m_radius; // 12.0f;
     float angle = 0.0f;
     float scale = 6.28f / (float)RAND_MAX;
     float dv;

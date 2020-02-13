@@ -551,7 +551,10 @@ bool SimulationGLCanvas::LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>
     //returning from this function (to confirm this function was successful.
     if (m_currentScene == sceneNumber)
         return false;
+    int w, h;
+    GetClientSize(&w, &h);
     
+
     if (sceneNumber == 0) {
         //SplashScene
         m_animationScene = make_shared<SplashScene>();
@@ -572,6 +575,7 @@ bool SimulationGLCanvas::LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>
         m_currentScene = sceneNumber;
        // m_animationScene = new CollisionScene();
     }
+    SetCanvasSize(w, h);
     return true;
 }
 

@@ -178,15 +178,19 @@ void ObjectUnit::Calculate(float deltaTime)
     trans[3].y = 0.0f;
     float dval = 100.0f;
     //trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
+    //m_position = { 0, 0 ,0  };
     trans = glm::translate(trans, glm::vec3(m_position.x*(w/2), m_position.y*(h/2), m_position.z));
     trans = glm::rotate(trans, glm::radians(deg), glm::vec3(0.0, 0.0, 1.0));
     //m_trans = trans;
    // m_trans = glm::scale(trans, glm::vec3(25.0f, 25.0f, 1.0));
+    
     if (inflate) {
         if (m_inflateValue < 1.0f) {
+            m_inflateValue = 1.0f;
             m_inflateValue += deltaTime * factor;
         }
-        trans = glm::scale(trans, glm::vec3(150.0*m_inflateValue-50.0, 150.0*m_inflateValue-50.0, 1.0));
+        trans = glm::scale(trans, glm::vec3(75.0, 75.0, 1.0));
+        //trans = glm::scale(trans, glm::vec3(150.0*m_inflateValue-50.0, 150.0*m_inflateValue-50.0, 1.0));
         //trans = glm::scale(trans, glm::vec3(0.25*m_inflateValue, 0.32*m_inflateValue, 1.0));    
     }
     else {
@@ -200,6 +204,13 @@ void ObjectUnit::Calculate(float deltaTime)
 void ObjectUnit::Draw(float deltaTime, unsigned int shaderProgram)
 {  
     Calculate(deltaTime);
+    float radius=12.0f;
+    if (m_inflateValue > 0.5f) {
+        radius = 35.0f;
+    }
+    m_particleGen->Update(deltaTime,m_position, radius);
+    m_particleGen->Draw(deltaTime);
+    glUseProgram(m_shaderProgram);
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(m_trans));
 
@@ -210,9 +221,6 @@ void ObjectUnit::Draw(float deltaTime, unsigned int shaderProgram)
 
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    m_particleGen->Update(deltaTime,m_position);
-    m_particleGen->Draw(deltaTime);
 }
 
 //v is the vector to be given a random value.  And the range of values

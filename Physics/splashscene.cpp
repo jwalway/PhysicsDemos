@@ -111,7 +111,11 @@ int SplashScene::LoadObjects(char* filename)
     }
 
     LoadShaders(vertexShader.c_str(), fragmentShader.c_str());
-
+    for (auto& o : m_objects)
+    {
+        ObjectUnit *ou = dynamic_cast<ObjectUnit*>(o);
+        ou->SetShaderProgram(m_shaderProgram);
+    }
     return 0;
 }
 
@@ -121,7 +125,7 @@ void SplashScene::Draw(float deltaTime)
     for (auto& x : m_objects)
     {
         x->Draw(deltaTime, m_shaderProgram);
-        break;
+        //break;
     }
 }
 
