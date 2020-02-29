@@ -21,6 +21,15 @@ float positiveDelta(float x1, float x2)
 
 void SplashScene::Initialize(int state)
 {
+    //"..\\resources\\SplashScene\\animation1.data"
+
+    m_wordsParticles = make_shared<Words>();
+    m_wordsParticles->SetResourceManager(m_resources);
+    m_wordsParticles->LoadShaders("..\\resources\\SplashScene\\letterparticle.vert", "..\\resources\\SplashScene\\letterparticle.frag");
+    m_wordsParticles->Setup(m_width, m_height);
+    m_wordsParticles->LoadTexture("..\\resources\\SplashScene\\particle.png");
+
+    /*
     for (auto& x : m_objects)
     {
         x->InitObject();
@@ -28,17 +37,18 @@ void SplashScene::Initialize(int state)
             x->SetState(1);
         }
     }
-    
+    */
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-    glUseProgram(m_shaderProgram);
-    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
-    glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);
+    //glUseProgram(m_shaderProgram);
+    //glUniform1i(glGetUniformLocation(m_shaderProgram, "texture1"), 0);
+    //glUniform1i(glGetUniformLocation(m_shaderProgram, "texture2"), 1);
 }
 
 void SplashScene::Replay()
 {
-    for (auto& x : m_objects)
-        x->Replay();
+    m_wordsParticles->Replay();
+    //for (auto& x : m_objects)
+     //   x->Replay();
 }
 
 
@@ -121,12 +131,17 @@ int SplashScene::LoadObjects(char* filename)
 
 void SplashScene::Draw(float deltaTime) 
 {
-    UseShaderProgram();   
+    //UseShaderProgram();   
+    /*
     for (auto& x : m_objects)
     {
         x->Draw(deltaTime, m_shaderProgram);
         //break;
     }
+    */
+    int err = glGetError();
+    m_wordsParticles->Update(deltaTime);
+    m_wordsParticles->Draw();
 }
 
 void SplashScene::Process(float deltaTime)

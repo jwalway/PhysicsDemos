@@ -154,6 +154,7 @@
     <ClInclude Include="animations.h" />
     <ClInclude Include="collisionscene.h" />
     <ClInclude Include="dxfrenderer.h" />
+    <ClInclude Include="letters.h" />
     <ClInclude Include="objectunit.h" />
     <ClInclude Include="particlesystem.h" />
     <ClInclude Include="physics.h" />
@@ -166,6 +167,7 @@
     <ClCompile Include="animations.cpp" />
     <ClCompile Include="collisionscene.cpp" />
     <ClCompile Include="dxfrenderer.cpp" />
+    <ClCompile Include="letters.cpp" />
     <ClCompile Include="objectunit.cpp" />
     <ClCompile Include="particlesystem.cpp" />
     <ClCompile Include="physics.cpp" />

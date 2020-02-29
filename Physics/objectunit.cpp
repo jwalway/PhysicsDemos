@@ -207,7 +207,7 @@ void ObjectUnit::Draw(float deltaTime, unsigned int shaderProgram)
     float radius=12.0f;
     if (m_inflateValue > 0.5f) {
         radius = 35.0f;
-    }
+    }   
     m_particleGen->Update(deltaTime,m_position, radius);
     m_particleGen->Draw(deltaTime);
     glUseProgram(m_shaderProgram);
@@ -220,7 +220,7 @@ void ObjectUnit::Draw(float deltaTime, unsigned int shaderProgram)
     //glBindTexture(GL_TEXTURE_2D, m_texture2);
 
     glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); 
 }
 
 //v is the vector to be given a random value.  And the range of values

@@ -558,7 +558,7 @@ bool SimulationGLCanvas::LoadScene(int sceneNumber, weak_ptr<AnimationSceneBase>
     if (sceneNumber == 0) {
         //SplashScene
         m_animationScene = make_shared<SplashScene>();
-        m_animationScene->LoadObjects("..\\resources\\SplashScene\\animation1.data");
+        //m_animationScene->LoadObjects("..\\resources\\SplashScene\\animation1.data");
         m_animationScene->Initialize(1);
         scene = m_animationScene;
         m_currentScene = sceneNumber;
@@ -773,7 +773,6 @@ void SimulationGLCanvas::DrawScene()
 {
     // must always be here
     wxPaintDC dc(this);
-
     SetCurrent(*m_glRC);
 
     // Initialize OpenGL
@@ -784,7 +783,6 @@ void SimulationGLCanvas::DrawScene()
         ResetOrthoMode();
         m_gldata.initialized = true;
     }
-
     glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -890,6 +888,7 @@ void SimulationGLCanvas::InitGL()
 
     /* speedups */
     glEnable(GL_DITHER);
+    glEnable(GL_BLEND);
     glShadeModel(GL_SMOOTH);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
@@ -906,8 +905,7 @@ void SimulationGLCanvas::InitGL()
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
     char* glver = (char*)glGetString(GL_VERSION);
-    int i = 0;
-    i++;
+ 
     GLenum res = glewInit();
     string str;
     if (res != GLEW_OK) {
@@ -927,9 +925,12 @@ void SimulationGLCanvas::InitGLScene()
  
 
     //m_animationScene = make_unique<SplashScene>();
-    m_animationScene->LoadObjects("..\\resources\\SplashScene\\animation1.data");
+    //m_animationScene->LoadObjects("..\\resources\\SplashScene\\animation1.data");
     //m_animationScene->LoadObjects("..\\resources\\SplashScene\\animationTest.data");
-    m_animationScene->Initialize(); 
+    int w, h;
+    GetClientSize(&w, &h);
+    SetCanvasSize(w, h);
+    m_animationScene->Initialize();
 }
 
 void SimulationGLCanvas::ResetProjectionMode()

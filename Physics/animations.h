@@ -49,7 +49,7 @@ public:
 		m_controls = &controls;
 	}
 	virtual void Description(wxRichTextCtrl& r)=0;
-	void SetCanvasSize(int w,int h) 
+	virtual void SetCanvasSize(int w,int h) 
 	{
 		m_width = w;
 		m_height = h;

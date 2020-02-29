@@ -54,7 +54,7 @@ void ParticleGenerator::Draw(float deltaTime)
 {
     int val = (int)glGetError();
     static float delta = 0.0f;
-
+    return;
     delta += 0.1f;
     if (delta > 25.0f)
         delta = 0.0f;

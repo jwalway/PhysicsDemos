@@ -12,6 +12,7 @@
 #pragma once
 
 #include "animations.h"
+#include "letters.h"
 
 class SplashScene : public AnimationSceneBase {
 public:
@@ -21,9 +22,18 @@ public:
 	void Initialize(int state);
 	void Replay();
 	void Description(wxRichTextCtrl& r);
+	void SetCanvasSize(int w, int h)
+	{
+		if (m_wordsParticles != nullptr) {
+			m_wordsParticles->SetCanvasSize(w, h);
+		}
+		AnimationSceneBase::SetCanvasSize(w, h);
+	}
 	//virtual void RunScene() = 0;
 	void RunScene() {};
 	~SplashScene();
+private:
+	shared_ptr<Words> m_wordsParticles;
 };
 
 enum class Splash
