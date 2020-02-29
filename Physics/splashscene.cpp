@@ -23,7 +23,7 @@ void SplashScene::Initialize(int state)
 {
     //"..\\resources\\SplashScene\\animation1.data"
 
-    m_wordsParticles = make_shared<Words>();
+    m_wordsParticles = make_shared<WordsParticles>();
     m_wordsParticles->SetResourceManager(m_resources);
     m_wordsParticles->LoadShaders("..\\resources\\SplashScene\\letterparticle.vert", "..\\resources\\SplashScene\\letterparticle.frag");
     m_wordsParticles->Setup(m_width, m_height);

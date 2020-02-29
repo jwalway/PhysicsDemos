@@ -40,11 +40,28 @@ public:
     float resetLife;
 };
 
-class LetterData {
+class PiecewiseCurve {
+public:
+    void SetPeriod(float period)
+    {
+        m_period = period;
+        m_currentTime = 0.0f;       
+    }
+
+    void AddPoints(initializer_list<glm::vec2> pts);
+    void RemovePoints() { m_points.clear(); }
+    glm::vec2 PlayCurve(float deltaTime);
+private:
+    float m_period;   
+    float m_currentTime;
+    std::vector<glm::vec2> m_points;
+};
+
+class LetterParticles {
     glm::vec2 m_position;     // 8 bytes    
     glm::vec2 m_velocity;     // 8 bytes  - offset 16
 public:
-    LetterData();
+    LetterParticles();
     void SetPath(glm::vec2 p0, glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, float period)
     {
         m_pts[0] = p0;
@@ -110,21 +127,21 @@ private:
     float m_period; //total time over which the letter moves from starting point to ending point.
     float m_timeRemaining; //time remaining in seconds to complete path.
     glm::vec2 m_pts[4];
-
+    PiecewiseCurve m_dynamicsCurve;
     glm::vec2 BezierPath(glm::vec2 p0, glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, float t);
     //float m_p0, m_p1, m_p2, m_p3; //Control points for the Bezier path
 };
 
 //Spells out "PHYSICS SIMULATIONS"
-class Words {
+class WordsParticles {
 
 public:
-    Words();
+    WordsParticles();
     void SetResourceManager(shared_ptr<ResourceManager> resources)
     {
         m_resources = resources;
     }
-    ~Words();
+    ~WordsParticles();
     bool Setup(int w, int h);
     void Update(float dt = 0.016f);
     void Replay() 
@@ -172,7 +189,7 @@ private:
     size_t bytes_allocated;                     /* number of bytes we allocted on gpu */
     std::vector<Particle2> drops;               /* the water drop particles */
     glm::mat4 pm;                                    /* projection matrix; ortho */
-    std::vector<LetterData> m_letters;// , m_P2, m_P3, m_P4;
+    std::vector<LetterParticles> m_letters;// , m_P2, m_P3, m_P4;
     void Make_P(glm::vec2 pos,float scale, float dInc);
     void Make_H(glm::vec2 pos, float scale, float dInc);
     void Make_Y(glm::vec2 pos, float scale, float dInc);
@@ -190,13 +207,13 @@ private:
     float m_range1 = 1.0, m_range2 = 3.0f; // 0.05, 0.1
     float m_rangeA = 0.01f, m_rangeB = 0.03f; // 0.05, 0.1
     void CreateLetters();
-    void HorizontalLine(LetterData& p, glm::vec2 ptStart, float xEnd,float scale=50.0f, float dInc=0.01);
-    void VerticalLine(LetterData& p, glm::vec2 ptStart, float yEnd, float scale=50.0f, float dInc=0.01f);
+    void HorizontalLine(LetterParticles& p, glm::vec2 ptStart, float xEnd,float scale=50.0f, float dInc=0.01);
+    void VerticalLine(LetterParticles& p, glm::vec2 ptStart, float yEnd, float scale=50.0f, float dInc=0.01f);
 
-    void HorizontalLine2(LetterData& p, glm::vec2 ptStart, float xEnd, float scale = 50.0f, float dInc = 0.01);
-    void VerticalLine2(LetterData& p, glm::vec2 ptStart, float yEnd, float scale = 50.0f, float dInc = 0.01f);
+    void HorizontalLine2(LetterParticles& p, glm::vec2 ptStart, float xEnd, float scale = 50.0f, float dInc = 0.01);
+    void VerticalLine2(LetterParticles& p, glm::vec2 ptStart, float yEnd, float scale = 50.0f, float dInc = 0.01f);
 
-    void DiagonalLine(LetterData& p, glm::vec2 ptStart, glm::vec2 ptEnd, float scale = 50.0f, float dInc = 0.01f);
-    void EllipseLine(LetterData& p, glm::vec2 ptStart, float major, float minor, float angStart, float angEnd, float scale = 50.0f, float dInc = 0.01f);
+    void DiagonalLine(LetterParticles& p, glm::vec2 ptStart, glm::vec2 ptEnd, float scale = 50.0f, float dInc = 0.01f);
+    void EllipseLine(LetterParticles& p, glm::vec2 ptStart, float major, float minor, float angStart, float angEnd, float scale = 50.0f, float dInc = 0.01f);
     shared_ptr<ResourceManager> m_resources;
 };

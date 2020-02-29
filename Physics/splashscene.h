@@ -33,7 +33,7 @@ public:
 	void RunScene() {};
 	~SplashScene();
 private:
-	shared_ptr<Words> m_wordsParticles;
+	shared_ptr<WordsParticles> m_wordsParticles;
 };
 
 enum class Splash

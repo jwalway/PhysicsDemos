@@ -41,9 +41,56 @@ mass(0.0), inv_mass(0.0), size(0.0), resetLife(1.0), life(1.0), color(1.0,0.0,0.
 Particle2::~Particle2() {
 }
 
+
+void PiecewiseCurve::AddPoints(initializer_list<glm::vec2> pts)
+{
+    initializer_list<glm::vec2>::iterator itr;
+    itr = pts.begin();
+    for (auto pt : pts)
+    {
+        m_points.push_back(pt);
+    }
+
+    //Sort and eliminate duplicate x values;
+
+}
+
+glm::vec2 PiecewiseCurve::PlayCurve(float deltaTime)
+{
+    glm::vec2 rslt=glm::vec2(0.0f,0.0f);
+
+    if(m_points.size() <= 1)
+        return rslt;
+
+    m_currentTime += deltaTime;
+    if (m_currentTime > m_period)
+    {
+        m_currentTime = 0.0f;
+    }
+    float x, curveLength;
+    curveLength = m_points.back().x - m_points[0].x;
+    x = m_currentTime * curveLength / m_period + m_points[0].x;
+    //First, determine the partition x is in
+    glm::vec2 pt0, pt1;
+    float m, b;
+    for (int i = 1; i < m_points.size(); i++) {
+        pt1 = m_points[i];
+        if (x <= pt1.x) {
+            pt0 = m_points[i - (int)1];
+            m = (pt1.y - pt0.y) / (pt1.x - pt0.x);
+            b = pt1.y - m * pt1.x;
+            rslt.x = x;
+            rslt.y = m * x + b;
+            break;
+        }
+    }
+    
+    return rslt;
+}
+
 // ------------------------------------
 
-Words::Words()
+WordsParticles::WordsParticles()
     :win_w(0)
     , win_h(0)
     , vbo(0)
@@ -52,10 +99,10 @@ Words::Words()
 {    
 }
 
-Words::~Words() {
+WordsParticles::~WordsParticles() {
 }
 
-bool Words::Setup(int w, int h) {
+bool WordsParticles::Setup(int w, int h) {
     //assert(w && h);
     win_w = w;
     win_h = h;
@@ -102,7 +149,7 @@ bool Words::Setup(int w, int h) {
     return true;
 }
 
-void Words::CreateLetters()
+void WordsParticles::CreateLetters()
 {
     float scale = 50.0f, dInc = 0.005f;
     float period = 5;
@@ -125,8 +172,10 @@ void Words::CreateLetters()
     scale = 0.25f;
     Make_P(pos, 0.25f, dInc);
     
+    
     //m_letters.back().SetPath(p0,p1,p2,pos,period);
     m_letters.back().CreatePathShape(pos, 1, 1, Randv(period1,period2));
+  
     //m_letters.back().CreatePath();
     //return;
     dx = 0.15f;
@@ -206,12 +255,12 @@ void Words::CreateLetters()
     }
 }
 
-void Words::ScaleToScreen(glm::vec2& pt)
+void WordsParticles::ScaleToScreen(glm::vec2& pt)
 {
     pt *= glm::vec2(win_w / 2.0f, win_h / 2.0f);
 }
 
-void Words::Update(float dt) {
+void WordsParticles::Update(float dt) {
 
     drops.clear(); 
     for (auto& let : m_letters)
@@ -248,7 +297,7 @@ void Words::Update(float dt) {
     }
 }
 
-void Words::Draw() {
+void WordsParticles::Draw() {
    // glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glBindVertexArray(vao);
     glUseProgram(m_shaderProgram);
@@ -259,7 +308,7 @@ void Words::Draw() {
    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void Words::AddDrop(glm::vec2 position, float mass) {
+void WordsParticles::AddDrop(glm::vec2 position, float mass) {
     if (mass < 0.01f) {
         mass = 0.01f;
     }
@@ -278,7 +327,7 @@ void Words::AddDrop(glm::vec2 position, float mass) {
     i++;
 }
 
-GLuint Words::LoadTexture2(const char* imagepath)
+GLuint WordsParticles::LoadTexture2(const char* imagepath)
 {
     int width, height, nrChannels;
     unsigned char* data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
@@ -303,9 +352,9 @@ GLuint Words::LoadTexture2(const char* imagepath)
     return textureID;
 }
 
-void Words::Make_P(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_P(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;    
+    LetterParticles p;    
     //Make the backwards 'C' part
     //circle equation 2*pi*r ... r*cos(d), r*sin(d)
     glm::vec2 offset(0.0, 0.0); // (((float)win_w) / 4.0, ((float)win_h) / 4.0);
@@ -392,9 +441,9 @@ void Words::Make_P(glm::vec2 pos, float scale, float dInc)
     */
 }
 
-void Words::Make_H(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_H(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
     VerticalLine(p, glm::vec2(-0.2f, 0.5f), -0.5f, scale, dInc);
     HorizontalLine(p, glm::vec2(-0.2f, 0.05f), 0.2f, scale, dInc);
@@ -406,9 +455,9 @@ void Words::Make_H(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_Y(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_Y(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
     DiagonalLine(p, glm::vec2(-0.2f, 0.5f), glm::vec2(0.0f, 0.0f), scale, dInc);
     DiagonalLine(p, glm::vec2(0.0f, 0.0f), glm::vec2(0.2f, 0.5f), scale, dInc);
@@ -420,9 +469,9 @@ void Words::Make_Y(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_I(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_I(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
     HorizontalLine(p, glm::vec2(-0.1f, 0.5f), 0.1f, scale, dInc);    
     VerticalLine(p, glm::vec2(0.0f, 0.5f), -0.5f, scale, dInc);
@@ -434,9 +483,9 @@ void Words::Make_I(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_M(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_M(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
     DiagonalLine(p, glm::vec2(-0.2f, -0.5f), glm::vec2(-0.15f, 0.5f), scale, dInc/4.0f);
     DiagonalLine(p, glm::vec2(-0.15f, 0.5f), glm::vec2(0.0f, 0.0f), scale, dInc);
@@ -449,9 +498,9 @@ void Words::Make_M(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_L(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_L(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
 
     VerticalLine(p, glm::vec2(-0.2f, 0.5f), -0.5f, scale, dInc);
@@ -463,9 +512,9 @@ void Words::Make_L(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_A(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_A(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
 
     DiagonalLine(p, glm::vec2(-0.2f, -0.5f), glm::vec2(-0.0f, 0.5f), scale, dInc);
@@ -478,9 +527,9 @@ void Words::Make_A(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_T(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_T(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
 
     VerticalLine(p, glm::vec2(0.0f, 0.5f), -0.5f, scale, dInc);
@@ -492,9 +541,9 @@ void Words::Make_T(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_N(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_N(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
 
     VerticalLine(p, glm::vec2(-0.2f, 0.5f), -0.5f, scale, dInc);
@@ -507,9 +556,9 @@ void Words::Make_N(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_O(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_O(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
 
     EllipseLine(p, glm::vec2(0.0f, 0.0f), 0.2f, 0.5f, 0.0f, 6.28f, scale, dInc);
@@ -520,9 +569,9 @@ void Words::Make_O(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_C(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_C(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
 
     //EllipseLine(p, glm::vec2(0.0, 0.0), 0.2, 0.5, 1.2, 5.08, scale, dInc);
@@ -535,9 +584,9 @@ void Words::Make_C(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_U(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_U(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
 
     VerticalLine(p, glm::vec2(-0.2f, 0.5f), 0.0f, scale, dInc);    
@@ -550,9 +599,9 @@ void Words::Make_U(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::Make_S(glm::vec2 pos, float scale, float dInc)
+void WordsParticles::Make_S(glm::vec2 pos, float scale, float dInc)
 {
-    LetterData p;
+    LetterParticles p;
     p.SetPosition(pos.x, pos.y);
     float yp = 0.25f;
 
@@ -566,7 +615,7 @@ void Words::Make_S(glm::vec2 pos, float scale, float dInc)
     m_letters.push_back(p);
 }
 
-void Words::HorizontalLine2(LetterData& p, glm::vec2 ptStart, float xEnd, float scale, float dInc)
+void WordsParticles::HorizontalLine2(LetterParticles& p, glm::vec2 ptStart, float xEnd, float scale, float dInc)
 {
     //Make the horizontal line 'l' part
     float x, y, dx;
@@ -599,7 +648,7 @@ void Words::HorizontalLine2(LetterData& p, glm::vec2 ptStart, float xEnd, float 
     return;
 }
 
-void Words::VerticalLine2(LetterData& p, glm::vec2 ptStart, float yEnd, float scale, float dInc)
+void WordsParticles::VerticalLine2(LetterParticles& p, glm::vec2 ptStart, float yEnd, float scale, float dInc)
 {
     float x, y, dy;
 
@@ -630,7 +679,7 @@ void Words::VerticalLine2(LetterData& p, glm::vec2 ptStart, float yEnd, float sc
     }
 }
 
-void Words::HorizontalLine(LetterData& p, glm::vec2 ptStart, float xEnd,float scale,float dInc)
+void WordsParticles::HorizontalLine(LetterParticles& p, glm::vec2 ptStart, float xEnd,float scale,float dInc)
 {
     //Make the horizontal line 'l' part
     float x, y, dx;
@@ -663,7 +712,7 @@ void Words::HorizontalLine(LetterData& p, glm::vec2 ptStart, float xEnd,float sc
     return;
 }
 
-void Words::VerticalLine(LetterData& p, glm::vec2 ptStart, float yEnd, float scale, float dInc)
+void WordsParticles::VerticalLine(LetterParticles& p, glm::vec2 ptStart, float yEnd, float scale, float dInc)
 {
     float x, y, dy;
 
@@ -694,7 +743,7 @@ void Words::VerticalLine(LetterData& p, glm::vec2 ptStart, float yEnd, float sca
     }
 }
 
-void Words::DiagonalLine(LetterData& p, glm::vec2 ptStart, glm::vec2 ptEnd, float scale, float dInc)
+void WordsParticles::DiagonalLine(LetterParticles& p, glm::vec2 ptStart, glm::vec2 ptEnd, float scale, float dInc)
 {
     float x, y, C, dx=dInc/2.0f;
     float rise, run, m;
@@ -733,7 +782,7 @@ void Words::DiagonalLine(LetterData& p, glm::vec2 ptStart, glm::vec2 ptEnd, floa
     
 }
 
-void Words::EllipseLine(LetterData& p, glm::vec2 ptStart, float major, float minor, float angStart, float angEnd,float scale, float dInc)
+void WordsParticles::EllipseLine(LetterParticles& p, glm::vec2 ptStart, float major, float minor, float angStart, float angEnd,float scale, float dInc)
 {
     float x, y, dAng = dInc * 5.0f;// / 2.0f;
     float angle;
@@ -767,22 +816,26 @@ void Words::EllipseLine(LetterData& p, glm::vec2 ptStart, float major, float min
     }
 }
 
-LetterData::LetterData() : m_position(0.0f, 0.0f),  m_velocity(0.0f, 0.0f)
+LetterParticles::LetterParticles() : m_position(0.0f, 0.0f),  m_velocity(0.0f, 0.0f)
 {
-
+    //0.015f;
+    //Create the piecewise curve
+   //m_dynamicsCurve.AddPoints({ glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(2.0f,0.0f), glm::vec2(3.0f,0.0f), glm::vec2(4.0f,0.1f), glm::vec2(7.0f,0.0f), glm::vec2(8.0f,0.015f) });
+    m_dynamicsCurve.AddPoints({ glm::vec2(0.0f, 0.015f), glm::vec2(1.0f, 0.015f), glm::vec2(2.0f,0.02f),glm::vec2(3.0f,0.125f), glm::vec2(4.0f,0.0f), glm::vec2(7.0f,0.0f), glm::vec2(9.0f,0.015f)});
+    m_dynamicsCurve.SetPeriod(20.0f);
 }
 
-void LetterData::Add(Particle2 wd)
+void LetterParticles::Add(Particle2 wd)
 {
     m_letter.push_back(wd);
 }
 
-void LetterData::Clear()
+void LetterParticles::Clear()
 {
     m_letter.clear();
 }
 
-void LetterData::CreatePathShape(glm::vec2 endPt, int shape,int invert,float period)
+void LetterParticles::CreatePathShape(glm::vec2 endPt, int shape,int invert,float period)
 {
     float inv = 1.0f;
     if (invert) {
@@ -806,7 +859,7 @@ void LetterData::CreatePathShape(glm::vec2 endPt, int shape,int invert,float per
     m_timeRemaining = m_period;
 }
 
-void LetterData::CreatePath()
+void LetterParticles::CreatePath()
 {
     float dt = 0.05f, t = 0.0;
     glm::vec2 pt;
@@ -858,12 +911,12 @@ void LetterData::CreatePath()
 
 }
 
-void LetterData::ScaleToScreen(glm::vec2& pt)
+void LetterParticles::ScaleToScreen(glm::vec2& pt)
 {
     pt *= glm::vec2(m_width / 2.0f, m_height / 2.0f);
 }
 
-void LetterData::Update(float deltaTime)
+void LetterParticles::Update(float deltaTime)
 {
     m_transform = glm::mat4(1.0f);
     float halfWidth = m_width / 2.0f;
@@ -914,11 +967,15 @@ void LetterData::Update(float deltaTime)
     float grn = 0.0f, tclr=0.1f;
     t = 1.0f - t;
     float d;
+    d = t + 0.015f;
+    if (t <= 0.0f) {
+        d = m_dynamicsCurve.PlayCurve(deltaTime).y;
+    }
     for (auto v : m_base)
     {
         glm::vec4 val = m_transform * glm::vec4(v.position, 0.0f, 1.0f);
 
-        d = t + 0.015f;
+
         m_letter[i].offset +=  m_letter[i].velocity * deltaTime*d;
         m_letter[i].life -= deltaTime;
 
@@ -947,31 +1004,11 @@ void LetterData::Update(float deltaTime)
         m_letter[i].color = glm::vec4(1.0f, grn, 0.0f, m_alpha); // angY* m_letter[i].offset.y, 0.0f);
         i++;
         if (i > 100)
-            tclr = 1.0f;
-        continue;
-        angY += dv1;
-        angX += dv2;
-        if (angY > 1.0f) {
-            dv1 = -0.1f;
-            angY = 1.0f;
-        }
-        if (angY < -1.0f) {
-            dv1 = 0.1f;
-            angY = -1.0f;
-        }
-        if (angX > 1.0f) {
-            dv2 = -0.1f;
-            angX = 1.0f;
-        }
-        if (angX < -1.0f) {
-            dv2 = 0.1f;
-            angX = -1.0f;
-        }
-        i++;
+            tclr = 1.0f;      
     }
 }
 
-glm::vec2 LetterData::BezierPath(glm::vec2 p0, glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, float t)
+glm::vec2 LetterParticles::BezierPath(glm::vec2 p0, glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, float t)
 {
     glm::vec2 rslt;
     if (t < 0.0f)
