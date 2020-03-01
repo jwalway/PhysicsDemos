@@ -11,6 +11,7 @@
 
 #include "splashscene.h"
 #include "zebra.xpm"
+#include "grass.xpm"
 
 float positiveDelta(float x1, float x2)
 {
@@ -149,8 +150,25 @@ void SplashScene::Process(float deltaTime)
 
 }
 
+unsigned char * LoadImage(const char* imagepath)
+{
+    int width, height, nrChannels;
+
+    //    if (DoesResourceExist(imagepath)) {
+     //       return GetResourceID(imagepath);
+      //  }
+
+
+    unsigned char* data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
+
+    int i = 0;
+    i++;
+    return data;
+}
+
 void SplashScene::Description(wxRichTextCtrl& r)
 {
+    //LoadImage("grass.png");
     r.Clear();
     r.Freeze();
     r.BeginSuppressUndo();
@@ -176,8 +194,13 @@ void SplashScene::Description(wxRichTextCtrl& r)
     r.EndItalic();
     r.EndFontSize();
     r.Newline();
-    r.WriteImage(wxBitmap(zebra_xpm));
-
+    //static const char* const zebra_xpm[] = {
+  //  r.WriteImage(wxBitmap((const char* const*)LoadImage("grass.png")));
+    //r.WriteImage(wxBitmap(zebra_xpm));
+    //grass_xpm;
+    r.WriteImage(wxBitmap(grass_xpm));
+    //wxBitmap((const void*)LoadImage("grass.png"), wxBITMAP_TYPE_PNG, 512, 512);
+    //r.WriteImage(wxBitmap((const char*)LoadImage("bricks_256by256.jpg"), 256, 256));
     r.Newline();
     r.Newline();
 

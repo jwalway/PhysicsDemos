@@ -59,7 +59,7 @@ bool MyApp::OnInit()
         return false;
 
     // Create the main frame window
-    MyFrame* frame = new MyFrame(NULL, wxT("wxWidgets Penguin Sample"),
+    MyFrame* frame = new MyFrame(NULL, wxT("Physics Simulations"),
         wxDefaultPosition, wxSize(800, 800));  // wxDefaultSize);
 
 
@@ -188,10 +188,11 @@ void MyFrame::PopulateListBox()
         m_list->InsertItem(i, topics[i].c_str());
 }
 
+
 void MyFrame::WriteInitialText()
 {
     wxRichTextCtrl& r = *m_richTextCtrl;
-
+       
     //r.SetDefaultStyle();
     r.Freeze();
     r.BeginSuppressUndo();
