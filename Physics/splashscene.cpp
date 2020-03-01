@@ -12,6 +12,7 @@
 #include "splashscene.h"
 #include "zebra.xpm"
 #include "grass.xpm"
+#include "newton.xpm"
 
 float positiveDelta(float x1, float x2)
 {
@@ -198,7 +199,8 @@ void SplashScene::Description(wxRichTextCtrl& r)
   //  r.WriteImage(wxBitmap((const char* const*)LoadImage("grass.png")));
     //r.WriteImage(wxBitmap(zebra_xpm));
     //grass_xpm;
-    r.WriteImage(wxBitmap(grass_xpm));
+    //r.WriteImage(wxBitmap(grass_xpm));
+    r.WriteImage(wxBitmap(newton_xpm));
     //wxBitmap((const void*)LoadImage("grass.png"), wxBITMAP_TYPE_PNG, 512, 512);
     //r.WriteImage(wxBitmap((const char*)LoadImage("bricks_256by256.jpg"), 256, 256));
     r.Newline();
