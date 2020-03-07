@@ -29,7 +29,8 @@ void SplashScene::Initialize(int state)
     m_wordsParticles->SetResourceManager(m_resources);
     m_wordsParticles->LoadShaders("..\\resources\\SplashScene\\letterparticle.vert", "..\\resources\\SplashScene\\letterparticle.frag");
     m_wordsParticles->Setup(m_width, m_height);
-    m_wordsParticles->LoadTexture("..\\resources\\SplashScene\\particle.png");
+
+    m_wordsParticles->LoadTexture("..\\resources\\SplashScene\\Flames1.png");
 
     /*
     for (auto& x : m_objects)

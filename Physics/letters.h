@@ -32,9 +32,10 @@ public:
     glm::vec2 forces;       // 8 bytes  - offset 8
     glm::vec2 velocity;     // 8 bytes  - offset 16
     float mass;        // 4 bytes  - offset 24
-    float inv_mass;    // 4 bytes  - offset 28 
+    float angle;    // 4 bytes  - offset 28 
     float size;        // 4 bytes  - offset 32
-    glm::vec4 color;   // 12 bytes - offset 36
+    glm::vec4 color;   // 16 bytes - offset 36
+    int txtnum;  // 4 bytes -- offset 52, Dividing the texture into four equal squares and given each square a number from 0 to 3
     glm::vec2 offset;  // for particle dynamics
     float life;
     float resetLife;
@@ -123,7 +124,7 @@ private:
     glm::mat4 m_transform;
     int m_width, m_height;
     float m_angle = 0.0f;
-    float m_alpha = 0.5f;
+    float m_alpha = 0.8f; // 0.5f;
     float m_period; //total time over which the letter moves from starting point to ending point.
     float m_timeRemaining; //time remaining in seconds to complete path.
     glm::vec2 m_pts[4];
@@ -156,14 +157,13 @@ public:
     void SetShader(unsigned int shader) { m_shaderProgram = shader; }
     void SetCanvasSize(int w, int h)
     {
-        win_w = w;
-        win_h = h;
+        m_width = w;
+        m_height = h;
         for (auto& v : m_letters)
         {
             v.SetScreen(w, h);
         }
-    }
-    GLuint LoadTexture2(const char* imagepath);
+    }    
     GLuint LoadTexture(const char* imagepath)
     {
         m_texture = m_resources->LoadTexture(imagepath);
@@ -177,8 +177,8 @@ public:
     void SetTexture(unsigned int texture) { m_texture = texture; }
     void ScaleToScreen(glm::vec2& pt);
 private:
-    int win_w;
-    int win_h;
+    int m_width;
+    int m_height;
     float m_size = 4.0f;
     unsigned int prog;                               /* shaders / prog */
     unsigned int m_shaderProgram;

@@ -32,7 +32,7 @@ float Randv(float startRange = -1.0f, float endRange = 1.0f)
 }
 
 Particle2::Particle2() : position(0.0, 0.0), forces(0.0, 0.0), velocity(0.0, 0.0), 
-mass(0.0), inv_mass(0.0), size(0.0), resetLife(1.0), life(1.0), color(1.0,0.0,0.0,1.0)
+mass(0.0), angle(0.0), size(0.0), resetLife(1.0), life(1.0), color(1.0,0.0,0.0,1.0)
 
 {
 
@@ -91,8 +91,8 @@ glm::vec2 PiecewiseCurve::PlayCurve(float deltaTime)
 // ------------------------------------
 
 WordsParticles::WordsParticles()
-    :win_w(0)
-    , win_h(0)
+    :m_width(0)
+    , m_height(0)
     , vbo(0)
     , vao(0)
     , bytes_allocated(0)
@@ -104,31 +104,22 @@ WordsParticles::~WordsParticles() {
 
 bool WordsParticles::Setup(int w, int h) {
     //assert(w && h);
-    win_w = w;
-    win_h = h;
+    m_width = w;
+    m_height = h;
     CreateLetters();
     srand((unsigned int)time(NULL));
-    //pm.ortho(0, w, h, 0, 0.0f, 100.0f);
+
     pm = glm::ortho(0.0f, static_cast<GLfloat>(w), static_cast<GLfloat>(h), 0.0f, 0.0f, 100.0f); // -1.0f, 1.0f);
     pm[1].y *= -1.0f;
     pm[3].x = 0.0f;
     pm[3].y = 0.0f;
     // create shader 
-    const char* atts[] = { "a_pos", "a_size" };
-    // prog.create(GL_VERTEX_SHADER, rx_to_data_path("waterdrop.vert"));
-    // prog.create(GL_FRAGMENT_SHADER, rx_to_data_path("waterdrop.frag"));
-   //  prog.link(2, atts);
-    glUseProgram(m_shaderProgram); //glUseProgram(prog.id);
+    const char* atts[] = { "a_pos", "a_size" }; 
+    glUseProgram(m_shaderProgram); 
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, "u_pm"), 1, GL_FALSE, (const float*)glm::value_ptr(pm));
     float cx = w * 0.5f;
     float cy = h * 0.5f;
-    /*
-    int num = 10;
-    for (int i = 0; i < num; ++i) {
-        addDrop(glm::vec2(Random(0, w), Random(0, h)), 1.0f);
-    }
-    */
-    //int err = glGetError();
+
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glGenBuffers(1, &vbo);
@@ -137,58 +128,36 @@ bool WordsParticles::Setup(int w, int h) {
     glEnableVertexAttribArray(0); // pos
     glEnableVertexAttribArray(1); // size
     glEnableVertexAttribArray(2); // color   (was lifeOn)
+    glEnableVertexAttribArray(3); // texture segment, one of four quadrants of the texture 0 through 3
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Particle2), (GLvoid*)0);
     glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(Particle2), (GLvoid*)32);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Particle2), (GLvoid*)36);
-
- 
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Particle2), (GLvoid*)36); 
+    glVertexAttribIPointer(3, 1, GL_INT, sizeof(Particle2), (GLvoid*)52);
     glVertexAttribDivisor(0, 1);
     glVertexAttribDivisor(1, 1);
     glVertexAttribDivisor(2, 1);
- 
+    glVertexAttribDivisor(3, 1);
     return true;
 }
 
 void WordsParticles::CreateLetters()
 {
-    float scale = 50.0f, dInc = 0.005f;
-    float period = 5;
+    float scale = 0.25f, dInc = 0.005f; 
     float period1 = 4, period2 = 8;
     glm::vec2 pos;
-    glm::vec2 p0, p1, p2;
     float dx = 30.0f;
     float dy = 10.0f;
-    pos.x = -150.0f;
-    pos.y = 100.0f;
-    p0 = glm::vec2(-160.0f, -300.0f);
-    p1 = glm::vec2(-190.0f, -100.0f);
-    p2 = glm::vec2(0.0f, 40.0f);
-
-    ////////// 2/27/20, 5:22 p.m.
-    pos.x = -0.7f; // -0.8;
-    pos.y = 0.2f; // 0.458; // 0.5;
-    
+    pos.y = 0.2f;    
     pos.x = -0.55f;
-    scale = 0.25f;
-    Make_P(pos, 0.25f, dInc);
-    
-    
-    //m_letters.back().SetPath(p0,p1,p2,pos,period);
+    Make_P(pos, 0.25f, dInc);    
+
     m_letters.back().CreatePathShape(pos, 1, 1, Randv(period1,period2));
-  
-    //m_letters.back().CreatePath();
-    //return;
+
     dx = 0.15f;
     pos.x += dx;
     Make_H(pos, scale, dInc);
     m_letters.back().CreatePathShape(pos, 1, 1, Randv(period1, period2));
    
-   // m_letters.back().CreatePathShape(pos, 0, 1, period);
-    //m_letters.back().CreatePath();
-    //pos.x = -0.5;
-    //Make_H(pos, 0.25, dInc);
-    
-    //return;
     pos.x += dx;
     Make_Y(pos, scale, dInc);
     m_letters.back().CreatePathShape(pos, 0, 1, Randv(period1, period2));
@@ -205,8 +174,8 @@ void WordsParticles::CreateLetters()
     Make_S(pos, scale, dInc);
     m_letters.back().CreatePathShape(pos, 0, 1, Randv(period1, period2));
    
-    pos.y = -0.2f;// 30.0f;
-    pos.x = -0.8f; // 7; // -150.0;
+    pos.y = -0.2f;
+    pos.x = -0.8f;
     Make_S(pos, scale, dInc);
     m_letters.back().CreatePathShape(pos, 0, 0, Randv(period1, period2));
     m_letters.back().CreatePath();
@@ -241,23 +210,12 @@ void WordsParticles::CreateLetters()
     Make_S(pos, scale, dInc);
     m_letters.back().CreatePathShape(pos, 0, 0, Randv(period1, period2));
 
-    return;
-    while (pos.x < 160) {
-        Make_P(pos,scale,dInc);
-        pos.x += dx;
-    }
-
-    pos.y = 0.0f;
-    pos.x = -150.0f;
-    while (pos.x < 160) {
-        Make_P(pos,scale, dInc);
-        pos.x += dx;
-    }
+    return; 
 }
 
 void WordsParticles::ScaleToScreen(glm::vec2& pt)
 {
-    pt *= glm::vec2(win_w / 2.0f, win_h / 2.0f);
+    pt *= glm::vec2(m_width / 2.0f, m_height / 2.0f);
 }
 
 void WordsParticles::Update(float dt) {
@@ -267,23 +225,10 @@ void WordsParticles::Update(float dt) {
     {        
         let.Update(dt);
         let.GetLetter(drops);
-    }
-    /*
-    m_P.Update(dt);
-    m_P.GetLetter(drops);
-    m_P2.Update(dt);
-    m_P2.GetLetter(drops);
-    */
+    } 
     if (!drops.size()) {
         return;
     }
-    
-    glm::vec2 force(16.0, 0.0);
-
-    float x = 10.0f, y = 10.0f, delta = 5.0f;
-    glm::vec2 vel(10.2f, 20.5f);
-    int count = 0;
-    int val = sizeof(Particle2);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -298,14 +243,14 @@ void WordsParticles::Update(float dt) {
 }
 
 void WordsParticles::Draw() {
-   // glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+   // glBlendFunc(GL_SRC_ALPHA, GL_ONE); // _MINUS_SRC_ALPHA); // GL_ONE);
     glBindVertexArray(vao);
     glUseProgram(m_shaderProgram);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, drops.size()); 
     // Don't forget to reset to default blending mode
-   // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  //  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void WordsParticles::AddDrop(glm::vec2 position, float mass) {
@@ -315,7 +260,7 @@ void WordsParticles::AddDrop(glm::vec2 position, float mass) {
 
     Particle2 drop;
     drop.mass = mass;
-    drop.inv_mass = 1.0f / mass;
+    drop.angle = 0.0f; // 1.0f / mass;
     drop.position = position;
     drop.size = 10.0f; // Random(2, 20);
     drop.velocity = glm::vec2(0.0f, 0.0f);
@@ -327,38 +272,12 @@ void WordsParticles::AddDrop(glm::vec2 position, float mass) {
     i++;
 }
 
-GLuint WordsParticles::LoadTexture2(const char* imagepath)
-{
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
-    GLuint textureID;
-
-    glGenTextures(1, &textureID);
-
-    // "Bind" the newly created texture : all future texture functions will modify this texture
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    //stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    // Give the image to OpenGL
-    if (nrChannels == 3) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
-    }
-    else {
-        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    }
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    stbi_image_free(data);
-    return textureID;
-}
-
 void WordsParticles::Make_P(glm::vec2 pos, float scale, float dInc)
 {
     LetterParticles p;    
     //Make the backwards 'C' part
     //circle equation 2*pi*r ... r*cos(d), r*sin(d)
-    glm::vec2 offset(0.0, 0.0); // (((float)win_w) / 4.0, ((float)win_h) / 4.0);
-    //float scale = 50.0f;
+    glm::vec2 offset(0.0, 0.0); // (((float)m_width) / 4.0, ((float)m_height) / 4.0);    
     float r = 0.25f;
     float angle = 3.14f / 2.0f;
     float pidiv2 = 3.14f / 2.0f;
@@ -369,9 +288,11 @@ void WordsParticles::Make_P(glm::vec2 pos, float scale, float dInc)
     p.SetPosition(pos.x, pos.y);
     float dx2 = 0.2f;
     float range = 10.0f;
+    int txtnum = 0;
     while(angle > -pidiv2)
     {
         Particle2 wd;
+        wd.txtnum = (txtnum++) % 4;
         wd.size = m_size;
         wd.position.x = (r * cos(angle) + dx)*scale + dx2*scale;
         wd.position.y = (r * sin(angle) + dy)*scale;
@@ -389,7 +310,7 @@ void WordsParticles::Make_P(glm::vec2 pos, float scale, float dInc)
     HorizontalLine(p, glm::vec2(-0.2, 0.5), 0.0, scale, dInc);
     HorizontalLine(p, glm::vec2(-0.2, 0.0), 0.0, scale, dInc);
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h); 
+    p.SetScreen(m_width, m_height); 
     
     //p.SetVelocity(30.0f, -30.0f);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
@@ -408,37 +329,8 @@ void WordsParticles::Make_P(glm::vec2 pos, float scale, float dInc)
         wd.position.y = y*scale + offset.y;
         p.Add(wd);
         y -= dy;
-    }
-   
+    }   
     return;
-    /*
-    //Experimenting
-    x = 0.5;
-    y = 0.5;
-    while (y > -0.5f)
-    {
-        Particle2 wd;
-        wd.size = 10.0f;
-        wd.position.x = x * scale + offset.x;
-        wd.position.y = y * scale + offset.y;
-        p.Add(wd);
-        y -= dy;
-    }
-
-    x = -0.5;
-    y = -.5;
-    dy = 0.05;
-    dx = 0.05;
-    while (x < 0.5) 
-    {
-        Particle2 wd;
-        wd.size = 10.0f;
-        wd.position.x = x * scale + offset.x;
-        wd.position.y = y * scale + offset.y;
-        p.Add(wd);
-        x += dx;
-    }
-    */
 }
 
 void WordsParticles::Make_H(glm::vec2 pos, float scale, float dInc)
@@ -450,7 +342,7 @@ void WordsParticles::Make_H(glm::vec2 pos, float scale, float dInc)
     VerticalLine(p, glm::vec2(0.2f, 0.5f), -0.5f, scale, dInc);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -464,7 +356,7 @@ void WordsParticles::Make_Y(glm::vec2 pos, float scale, float dInc)
     VerticalLine(p, glm::vec2(0.0f, 0.0f), -0.5f, scale, dInc);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -478,7 +370,7 @@ void WordsParticles::Make_I(glm::vec2 pos, float scale, float dInc)
     HorizontalLine(p, glm::vec2(-0.1f, -0.5f), 0.1f, scale, dInc);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -493,7 +385,7 @@ void WordsParticles::Make_M(glm::vec2 pos, float scale, float dInc)
     DiagonalLine(p, glm::vec2(0.15f, 0.5f), glm::vec2(0.2f, -0.5f), scale, dInc/4.0f);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -507,7 +399,7 @@ void WordsParticles::Make_L(glm::vec2 pos, float scale, float dInc)
     HorizontalLine(p, glm::vec2(-0.2f, -0.5f), 0.2f, scale, dInc);    
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -522,7 +414,7 @@ void WordsParticles::Make_A(glm::vec2 pos, float scale, float dInc)
     HorizontalLine(p, glm::vec2(-0.1f, 0.0f), 0.1f, scale, dInc);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -536,7 +428,7 @@ void WordsParticles::Make_T(glm::vec2 pos, float scale, float dInc)
     HorizontalLine(p, glm::vec2(-0.2f, 0.5f), 0.2f, scale, dInc);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -551,7 +443,7 @@ void WordsParticles::Make_N(glm::vec2 pos, float scale, float dInc)
     VerticalLine(p, glm::vec2(0.2f, 0.5f), -0.5f, scale, dInc);    
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -564,7 +456,7 @@ void WordsParticles::Make_O(glm::vec2 pos, float scale, float dInc)
     EllipseLine(p, glm::vec2(0.0f, 0.0f), 0.2f, 0.5f, 0.0f, 6.28f, scale, dInc);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -579,7 +471,7 @@ void WordsParticles::Make_C(glm::vec2 pos, float scale, float dInc)
     EllipseLine(p, glm::vec2(0.0f, 0.0f), 0.2f, 0.5f, 0.8f, 5.48f, scale, dInc);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -594,7 +486,7 @@ void WordsParticles::Make_U(glm::vec2 pos, float scale, float dInc)
     EllipseLine(p, glm::vec2(0.0f, 0.0f), 0.2f, 0.5f, 3.14f, 6.28f, scale, dInc);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -610,7 +502,7 @@ void WordsParticles::Make_S(glm::vec2 pos, float scale, float dInc)
     EllipseLine(p, glm::vec2(0.0, -yp), 0.2f, 0.25f, 0.0f, 1.57f, scale, dInc);
 
     p.DuplicateLetter();
-    p.SetScreen(win_w, win_h);
+    p.SetScreen(m_width, m_height);
     p.SetVelocity(Randv(-50.0f, 50.0f), Randv(-50.0f, 50.0f));
     m_letters.push_back(p);
 }
@@ -694,9 +586,11 @@ void WordsParticles::HorizontalLine(LetterParticles& p, glm::vec2 ptStart, float
     y = ptStart.y; // -.5;  
     dx = dInc; // 0.005;
     float range = 10.0f;
+    int txtnum = 0;
     while (x < xEnd)
     {
         Particle2 wd;
+        wd.txtnum = (txtnum++) % 4;
         wd.size = m_size;
         wd.position.x = x * scale;
         wd.position.y = y * scale;
@@ -726,9 +620,11 @@ void WordsParticles::VerticalLine(LetterParticles& p, glm::vec2 ptStart, float y
     y = ptStart.y; // 0.5;
     dy = dInc; // 0.005;
     float range = 10.0f;
+    int txtnum = 0;
     while (y < yEnd)
     {
         Particle2 wd;
+        wd.txtnum = (txtnum++) % 4;
         wd.size = m_size;
         wd.position.x = x * scale;
         wd.position.y = y * scale;
@@ -763,10 +659,12 @@ void WordsParticles::DiagonalLine(LetterParticles& p, glm::vec2 ptStart, glm::ve
     C = ptEnd.y - rise / run * ptEnd.x; // *run / rise - ptEnd.x;
     x = ptStart.x;
     m = rise / run;
+    int txtnum = 0;
     while (x < ptEnd.x)
     {
         Particle2 wd;
         y = m * x + C;
+        wd.txtnum = (txtnum++) % 4;
         wd.size = m_size;
         wd.position.x = x * scale;
         wd.position.y = y * scale;
@@ -795,6 +693,7 @@ void WordsParticles::EllipseLine(LetterParticles& p, glm::vec2 ptStart, float ma
 
 
     angle = angStart;
+    int txtnum = 0;
     while (angle < angEnd)
     {
         Particle2 wd;
@@ -802,6 +701,7 @@ void WordsParticles::EllipseLine(LetterParticles& p, glm::vec2 ptStart, float ma
         x = major * glm::cos(angle) + ptStart.x;
         y = minor * glm::sin(angle) + ptStart.y;
 
+        wd.txtnum = (txtnum++) % 4;
         wd.size = m_size;
         wd.position.x = x * scale;
         wd.position.y = y * scale;
@@ -992,6 +892,7 @@ void LetterParticles::Update(float deltaTime)
         m_letter[i].position.x = val.x + m_letter[i].offset.x;
         m_letter[i].position.y = val.y + m_letter[i].offset.y;
 
+        m_letter[i].size = m_letter[i].offset.y * 100.0f + 4.0f;
         ScaleToScreen(m_letter[i].position);
         
         //Scale to screen
