@@ -243,14 +243,15 @@ void WordsParticles::Update(float dt) {
 }
 
 void WordsParticles::Draw() {
-   // glBlendFunc(GL_SRC_ALPHA, GL_ONE); // _MINUS_SRC_ALPHA); // GL_ONE);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE); // _MINUS_SRC_ALPHA); // GL_ONE);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindVertexArray(vao);
     glUseProgram(m_shaderProgram);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, drops.size()); 
     // Don't forget to reset to default blending mode
-  //  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void WordsParticles::AddDrop(glm::vec2 position, float mass) {
@@ -901,8 +902,9 @@ void LetterParticles::Update(float deltaTime)
         if (grn < 0.3f) {
             int jj = 0;
             jj++;
-        }        
-        m_letter[i].color = glm::vec4(1.0f, grn, 0.0f, m_alpha); // angY* m_letter[i].offset.y, 0.0f);
+        }
+        float tmpalpha = m_letter[i].life / m_letter[i].resetLife;
+        m_letter[i].color = glm::vec4(1.0f, grn, 0.0f, tmpalpha); // tmpalpha); // m_alpha); // angY* m_letter[i].offset.y, 0.0f);
         i++;
         if (i > 100)
             tclr = 1.0f;      
